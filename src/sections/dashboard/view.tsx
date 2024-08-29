@@ -5,11 +5,15 @@ import Typography from '@mui/material/Typography';
 
 import { useSettingsContext } from 'src/components/settings';
 import { useState } from 'react';
+import { LineChart } from '@mui/x-charts';
 
 // ----------------------------------------------------------------------
 
 export default function OneView() {
   const settings = useSettingsContext();
+
+  const uData = [4000, 3000];
+  const xLabels = ['Page A', 'Page B'];
 
   const [DailyBusinessResults, setDailyBusinessResults] = useState<any>({
     DailyRevenue: 0,
@@ -116,7 +120,23 @@ export default function OneView() {
               <Typography>Doanh thu bán hàng</Typography>
               <Typography>Thống kê đơn hàng</Typography>
             </Box>
-            <Box></Box>
+            <Box>
+              <LineChart
+                height={300}
+                series={[
+                  {
+                    data: uData,
+                    area: true,
+                    showMark: false,
+                    color: '#50b3efad',
+                  },
+                ]}
+                xAxis={[{ scaleType: 'point', data: xLabels }]}
+                sx={{
+                  width: '100%',
+                }}
+              />
+            </Box>
           </Box>
         </Box>
         <Box
