@@ -15,6 +15,7 @@ const PageFive = lazy(() => import('src/pages/dashboard/five'));
 const PageSix = lazy(() => import('src/pages/dashboard/six'));
 const PageCreateProduct = lazy(() => import('src/pages/dashboard/createProduct'));
 const DashboardPage = lazy(() => import('src/pages/dashboard/dashboard'));
+const ProductsPage = lazy(() => import('src/pages/dashboard/products'));
 
 // ----------------------------------------------------------------------
 
@@ -47,7 +48,7 @@ export const dashboardRoutes = [
         path: 'product',
         children: [
           { element: <PageFour />, index: true },
-          { path: 'products', element: <PageFive /> },
+          { path: 'products', element: <ProductsPage /> },
           { path: 'create-product', element: <PageCreateProduct /> },
           { path: 'categories', element: <PageSix /> },
         ],

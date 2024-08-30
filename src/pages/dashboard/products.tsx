@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-import FourView from 'src/sections/four/view';
+import ProductsView from 'src/sections/product-dashboard/view-products';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ export default function Page() {
         <title> Danh sách sản phẩm</title>
       </Helmet>
 
-      <FourView />
+      <ProductsView />
     </>
   );
 }
