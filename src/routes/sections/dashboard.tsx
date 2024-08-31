@@ -16,6 +16,7 @@ const PageSix = lazy(() => import('src/pages/dashboard/six'));
 const PageCreateProduct = lazy(() => import('src/pages/dashboard/createProduct'));
 const DashboardPage = lazy(() => import('src/pages/dashboard/dashboard'));
 const ProductsPage = lazy(() => import('src/pages/dashboard/products'));
+const ProductDetailPage = lazy(() => import('src/pages/dashboard/productDetail'));
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +52,7 @@ export const dashboardRoutes = [
           { path: 'products', element: <ProductsPage /> },
           { path: 'create-product', element: <PageCreateProduct /> },
           { path: 'categories', element: <PageSix /> },
+          { path: 'product-detail/:id', element: <ProductDetailPage /> },
         ],
       },
     ],

@@ -54,6 +54,7 @@ export function useNavData() {
             icon: ICONS.product,
             children: [
               { title: 'Danh sách sản phẩm', path: paths.dashboard.groupProduct.product },
+              { title: 'Thêm mới sản phẩm', path: paths.dashboard.groupProduct.createProduct },
               { title: 'Loại sản phẩm', path: paths.dashboard.groupProduct.category },
             ],
           },
