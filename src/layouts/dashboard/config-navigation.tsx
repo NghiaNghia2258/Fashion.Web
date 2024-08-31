@@ -62,12 +62,22 @@ export function useNavData() {
             title: 'Khách hàng',
             path: paths.dashboard.customer,
             icon: ICONS.user,
+            children: [
+              { title: 'Danh sách khách hàng', path: paths.dashboard.groupOrder.order },
+              { title: 'Thêm mới khách hàng', path: paths.dashboard.groupOrder.order },
+              { title: 'Nhóm khách hàng', path: paths.dashboard.groupOrder.order },
+            ],
           },
           {
             title: 'Đơn hàng',
             path: paths.dashboard.groupOrder.root,
             icon: ICONS.menuItem,
             children: [{ title: 'Danh sách hóa đơn', path: paths.dashboard.groupOrder.order }],
+          },
+          {
+            title: 'Bán hàng tại quầy',
+            path: paths.dashboard.setting,
+            icon: ICONS.analytics,
           },
           {
             title: 'Thống kê',
