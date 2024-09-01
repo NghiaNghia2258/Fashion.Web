@@ -29,6 +29,8 @@ export default function FileThumbnail({
 
   const format = fileFormat(path || preview);
 
+  console.log(fileData(file));
+
   const renderContent =
     format === 'image' && imageView ? (
       <Box
@@ -45,7 +47,7 @@ export default function FileThumbnail({
     ) : (
       <Box
         component="img"
-        src={fileThumb(format)}
+        src={URL.createObjectURL(file as Blob)}
         sx={{
           width: 32,
           height: 32,

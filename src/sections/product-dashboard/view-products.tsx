@@ -18,8 +18,6 @@ import { useState } from 'react';
 import { useRouter } from 'src/routes/hooks';
 import Button from '@mui/material/Button';
 
-import NumberFormat from 'react-number-format';
-
 // ----------------------------------------------------------------------
 
 export default function ProductsView() {
@@ -208,7 +206,7 @@ export default function ProductsView() {
           display: 'flex',
           gap: 2,
           borderRadius: 2,
-          bgcolor: (theme) => alpha(theme.palette.grey[500], 0.08),
+          bgcolor: (theme) => alpha(theme.palette.grey[500], 0.15),
           border: (theme) => `dashed 1px ${theme.palette.divider}`,
         }}
       >
@@ -322,7 +320,7 @@ export default function ProductsView() {
           mt: 5,
           padding: '10px 80px',
           borderRadius: 2,
-          bgcolor: (theme) => alpha(theme.palette.grey[500], 0.08),
+          bgcolor: (theme) => alpha(theme.palette.grey[500], 0.15),
           border: (theme) => `dashed 1px ${theme.palette.divider}`,
         }}
       >

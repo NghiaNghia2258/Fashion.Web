@@ -136,7 +136,15 @@ export default function OneView() {
   };
 
   return (
-    <Container maxWidth={settings.themeStretch ? false : 'xl'}>
+    <Container
+      maxWidth={settings.themeStretch ? false : 'xl'}
+      sx={{
+        borderRadius: 2,
+        padding: '20px 10px',
+        bgcolor: (theme) => alpha(theme.palette.grey[500], 0.04),
+        border: (theme) => `dashed 1px ${theme.palette.divider}`,
+      }}
+    >
       <Typography variant="h3">Tổng quan </Typography>
 
       <Box
@@ -147,7 +155,13 @@ export default function OneView() {
           backgroundColor: '',
         }}
       >
-        <Box sx={{ flex: 7, paddingRight: '50px', borderRight: '1px solid #00000073' }}>
+        <Box
+          sx={{
+            flex: 8,
+            paddingRight: '50px',
+            borderRight: '1px solid #00000073',
+          }}
+        >
           <Box
             sx={{
               display: 'flex',
@@ -219,7 +233,11 @@ export default function OneView() {
             sx={{
               marginTop: '40px',
               padding: '10px',
-              border: '1px solid',
+              borderRadius: '10px',
+              backgroundColor: '#f0f0f0',
+              '&:hover': {
+                backgroundColor: '#919eabcc',
+              },
             }}
           >
             <Box
@@ -255,8 +273,12 @@ export default function OneView() {
           <Box
             sx={{
               marginTop: '50px',
-              padding: '10px',
-              border: '1px solid',
+              padding: '15px 30px',
+              borderRadius: '10px',
+              backgroundColor: '#f0f0f0',
+              '&:hover': {
+                backgroundColor: '#919eabcc',
+              },
             }}
           >
             <Typography
@@ -287,7 +309,7 @@ export default function OneView() {
         </Box>
         <Box
           sx={{
-            flex: 3,
+            flex: 4,
             paddingLeft: '50px',
           }}
         >
