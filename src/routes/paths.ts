@@ -41,5 +41,11 @@ export const paths = {
       order: `${ROOTS.DASHBOARD}/order/orders`,
       category: `${ROOTS.DASHBOARD}/order/categories`,
     },
+    groupCustomer: {
+      root: `${ROOTS.DASHBOARD}/customer`,
+      customer: `${ROOTS.DASHBOARD}/customer/customers`,
+      category: `${ROOTS.DASHBOARD}/customer/categories`,
+      createCustomer: `${ROOTS.DASHBOARD}/customer/create-customer`,
+    },
   },
 };

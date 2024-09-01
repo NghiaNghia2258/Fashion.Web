@@ -63,9 +63,9 @@ export function useNavData() {
             path: paths.dashboard.customer,
             icon: ICONS.user,
             children: [
-              { title: 'Danh sách khách hàng', path: paths.dashboard.groupOrder.order },
-              { title: 'Thêm mới khách hàng', path: paths.dashboard.groupOrder.order },
-              { title: 'Nhóm khách hàng', path: paths.dashboard.groupOrder.order },
+              { title: 'Danh sách khách hàng', path: paths.dashboard.groupCustomer.customer },
+              { title: 'Thêm mới khách hàng', path: paths.dashboard.groupCustomer.createCustomer },
+              { title: 'Nhóm khách hàng', path: paths.dashboard.groupCustomer.category },
             ],
           },
           {
