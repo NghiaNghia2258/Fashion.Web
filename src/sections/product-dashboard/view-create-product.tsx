@@ -10,7 +10,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
@@ -22,20 +22,94 @@ import SendIcon from '@mui/icons-material/Send';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { InputFile } from 'src/components/file-thumbnail';
+
+import AlertDialog from 'src/components/dialog/alert-dialog';
+import { useRouter } from 'src/routes/hooks';
+
+import { DashboardContext } from 'src/layouts/dashboard';
+import ProductService from 'src/sevices/api/product-services';
+import { ProductDto } from 'src/sevices/DTOs/product-dto';
+import { SplashScreen } from 'src/components/loading-screen';
+
 // ----------------------------------------------------------------------
 
 export default function CreateProductView() {
   const settings = useSettingsContext();
+  const router = useRouter();
+  const toast = useContext(DashboardContext);
 
   const [sizes, setsizes] = useState<string[]>([]);
   const [colors, setcolors] = useState<string[]>([]);
   const [price, setprice] = useState<number>(0);
+  const [loading, setloading] = useState<boolean>(false);
+  const [isErrInputName, setisErrInputName] = useState<boolean>(false);
+  const [isErrInputDes, setisErrInputDes] = useState<boolean>(false);
   const [inventory, setinventory] = useState<number>(0);
-
   const [images, setImages] = useState<File[]>([]);
-
   const [details, setdetails] = useState<any[]>([]);
+  const [isOpenDialogCreate, setisOpenDialogCreate] = useState(false);
+  const [isOpenDialogCancel, setisOpenDialogCancel] = useState(false);
+  const [newProduct, setnewProduct] = useState<ProductDto>({
+    name: '',
+    mainImageUrl: '',
+    categoryId: '',
+    productVariants: [],
+  });
 
+  const handleDisagree = () => {
+    setisOpenDialogCreate(false);
+    setisOpenDialogCancel(false);
+  };
+  const handleCreateProduct = async () => {
+    setloading(true);
+    setisOpenDialogCreate(false);
+
+    const productServices = new ProductService();
+    const res = await productServices.Create(newProduct);
+    setloading(false);
+    if (res.isSucceeded) {
+      toast?.ShowToast({
+        severity: 'success',
+        description: 'Tạo sản phẩm thành công!',
+        autoHideDuration: 3000,
+        title: 'Thành công',
+      });
+      router.replace('/dashboard/product/products');
+    } else {
+      toast?.ShowToast({
+        severity: 'error',
+        description: res.message,
+        autoHideDuration: 3000,
+        title: 'Thất bại',
+      });
+    }
+  };
+  const handleAgreeCreate = async () => {
+    if (isErrInputName || newProduct.name?.length == 0) {
+      toast?.ShowToast({
+        severity: 'error',
+        description: 'Tên sản phẩm không hợp lệ',
+        autoHideDuration: 3000,
+        title: 'Thất bại',
+      });
+      setisErrInputName(true);
+    } else if (isErrInputDes) {
+      toast?.ShowToast({
+        severity: 'error',
+        description: 'Mô tả sản phẩm không hợp lệ',
+        autoHideDuration: 3000,
+        title: 'Thất bại',
+      });
+      setisErrInputDes(true);
+    } else {
+      await handleCreateProduct();
+    }
+    setisOpenDialogCreate(false);
+  };
+  const handleAgreeCancel = () => {
+    setisOpenDialogCancel(false);
+    router.replace('/dashboard/product/products');
+  };
   const columns: GridColDef[] = [
     {
       field: 'size',
@@ -193,13 +267,19 @@ export default function CreateProductView() {
                   Tên sản phẩm
                 </Typography>
                 <TextField
+                  error={isErrInputName}
+                  helperText={
+                    isErrInputName ? 'Tên sản phẩm phải lớn hơn 6 ký tự và không được để trống' : ''
+                  }
                   label="Nhập tên sản phẩm"
                   sx={{ width: '100%' }}
                   onChange={(event) => {
-                    // setOptionPagination({
-                    //   ...optionPagination,
-                    //   name: event.target.value,
-                    // });
+                    if (event.target.value.length < 6) {
+                      setisErrInputName(true);
+                    } else {
+                      setisErrInputName(false);
+                      setnewProduct({ ...newProduct, name: event.target.value });
+                    }
                   }}
                 />
               </Box>
@@ -221,10 +301,7 @@ export default function CreateProductView() {
                   <Select
                     value={''}
                     onChange={(event: SelectChangeEvent) => {
-                      // setOptionPagination({
-                      //   ...optionPagination,
-                      //   categoryId: event.target.value,
-                      // });
+                      setnewProduct({ ...newProduct, categoryId: event.target.value });
                     }}
                   >
                     {categories.map((category: any) => (
@@ -243,9 +320,24 @@ export default function CreateProductView() {
               }}
             >
               <Typography sx={{ marginBottom: '5px', fontSize: '16px', fontWeight: 700 }}>
-                Loại sản phẩm
+                Mô tả
               </Typography>
-              <TextField label="Mô tả" multiline rows={12} fullWidth />
+              <TextField
+                error={isErrInputDes}
+                helperText={isErrInputDes ? 'Mô tả sản phẩm phải nhỏ hơn 500 ký tự' : ''}
+                placeholder="Nhập mô tả"
+                multiline
+                rows={12}
+                fullWidth
+                onChange={(event) => {
+                  if (event.target.value.length > 500) {
+                    setisErrInputDes(true);
+                  } else {
+                    setisErrInputDes(false);
+                    setnewProduct({ ...newProduct, description: event.target.value });
+                  }
+                }}
+              />
             </Box>
             <Box>
               <Typography
@@ -296,7 +388,7 @@ export default function CreateProductView() {
                       onBlur={(event) => {
                         if (event.target.value) {
                           setsizes([...sizes, event.target.value]);
-                          event.target.value = null;
+                          event.target.value = '';
                         }
                       }}
                     />
@@ -342,7 +434,7 @@ export default function CreateProductView() {
                       onBlur={(event) => {
                         if (event.target.value) {
                           setcolors([...colors, event.target.value]);
-                          event.target.value = null;
+                          event.target.value = '';
                         }
                       }}
                     />
@@ -366,7 +458,12 @@ export default function CreateProductView() {
                     label="Giá bán"
                     type="number"
                     onChange={(event: any) => {
-                      setprice(parseInt(event.target.value, 0));
+                      if (parseInt(event.target.value, 0) > 0) {
+                        setprice(parseInt(event.target.value, 0));
+                      } else {
+                        event.target.value = undefined;
+                        setprice(0);
+                      }
                     }}
                   />
                 </Box>
@@ -385,7 +482,12 @@ export default function CreateProductView() {
                     label="Tồn kho"
                     type="number"
                     onChange={(event: any) => {
-                      setinventory(parseInt(event.target.value, 0));
+                      if (parseInt(event.target.value, 0) > 0) {
+                        setinventory(parseInt(event.target.value, 0));
+                      } else {
+                        event.target.value = undefined;
+                        setinventory(0);
+                      }
                     }}
                   />
                 </Box>
@@ -530,7 +632,9 @@ export default function CreateProductView() {
       >
         <Button
           sx={{ height: '40px', width: '80px' }}
-          onClick={() => {}}
+          onClick={() => {
+            setisOpenDialogCancel(true);
+          }}
           variant="contained"
           color="error"
           startIcon={<BackspaceIcon />}
@@ -540,7 +644,9 @@ export default function CreateProductView() {
         </Button>
         <Button
           sx={{ height: '40px' }}
-          onClick={() => {}}
+          onClick={() => {
+            setisOpenDialogCreate(true);
+          }}
           variant="contained"
           color="success"
           endIcon={<SendIcon />}
@@ -549,6 +655,26 @@ export default function CreateProductView() {
           Thêm mới
         </Button>
       </Box>
+
+      <AlertDialog
+        isOpen={isOpenDialogCancel}
+        labelAgree="Xác nhận"
+        labelDisagree="Hủy"
+        handleAgree={handleAgreeCancel}
+        handleDisagree={handleDisagree}
+        description="Hủy thao tác ?"
+        title="Xác nhận"
+      />
+      <AlertDialog
+        isOpen={isOpenDialogCreate}
+        labelAgree="Xác nhận"
+        labelDisagree="Hủy"
+        handleAgree={handleAgreeCreate}
+        handleDisagree={handleDisagree}
+        description="Xác nhận thêm mới sản phẩm ?"
+        title="Thêm sản phẩm"
+      />
+      {loading ? <SplashScreen sx={{ position: 'fixed', opacity: 0.5 }} /> : null}
     </Container>
   );
 }

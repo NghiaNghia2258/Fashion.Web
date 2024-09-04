@@ -13,35 +13,60 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import TablePagination from '@mui/material/TablePagination';
 
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import { useSettingsContext } from 'src/components/settings';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'src/routes/hooks';
 import Button from '@mui/material/Button';
+
+import AlertDialog from 'src/components/dialog/alert-dialog';
+import { OptionFilterProduct } from 'src/sevices/paramas/option-filter-product';
+import ProductService from 'src/sevices/api/product-services';
+import { ProductDto } from 'src/sevices/DTOs/product-dto';
+import CircularProgress from '@mui/material/CircularProgress';
+import ProductCategoryService from 'src/sevices/api/product-category-services';
+import { ProductCategoryDto } from 'src/sevices/DTOs/product-category-dto';
+import { DashboardContext } from 'src/layouts/dashboard';
 
 // ----------------------------------------------------------------------
 
 export default function ProductsView() {
   const settings = useSettingsContext();
+  const toast = useContext(DashboardContext);
   const router = useRouter();
 
-  const [categories, setcategories] = useState([
-    {
-      id: '1asd-12as',
-      name: 'Áo',
-    },
-    {
-      id: '2asd-12as',
-      name: 'Quần',
-    },
-    {
-      id: '3asd-12as',
-      name: 'Giày',
-    },
-  ]);
-  const [optionPagination, setOptionPagination] = useState({
+  const [open, setOpen] = useState<boolean>(false);
+  const [totalRecordsCount, settotalRecordsCount] = useState<number>(0);
+  const [messageErr, setmessageErr] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [idDelete, setidDelete] = useState<string>('');
+
+  const handleDisagree = () => {
+    setOpen(false);
+    setidDelete('');
+  };
+
+  const handleAgree = () => {
+    setOpen(false);
+    handleDeleteProduct(idDelete);
+  };
+  const handleFilter = async () => {
+    const productServices = new ProductService();
+    setLoading(true);
+    const res = await productServices.GetAll(optionFilter);
+    if (res.isSucceeded) {
+      setProducts(res.data ?? []);
+      settotalRecordsCount(res.totalRecordsCount ?? 0);
+    }
+    setLoading(false);
+  };
+
+  const [categories, setcategories] = useState<ProductCategoryDto[]>([]);
+  const [optionFilter, setoptionFilter] = useState<OptionFilterProduct>({
     pageSize: 5,
     pageIndex: 1,
-    totalRows: 30,
     name: null,
     status: null,
     priceMin: null,
@@ -49,146 +74,50 @@ export default function ProductsView() {
     categoryId: null,
   });
 
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: 'Product 1',
-      mainImageUrl: '',
-      price: 431999,
-      inventory: 10,
-      categoryId: '3asd-12as',
-      categoryName: 'Quần',
-      productVariants: [
-        {
-          size: 'XL',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'XXL',
-          color: 'Red',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'M',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-      ],
-    },
-    {
-      id: 1,
-      name: 'Product 1',
-      mainImageUrl: '',
-      price: 431999,
-      inventory: 10,
-      categoryId: '3asd-12as',
-      categoryName: 'Quần',
-      productVariants: [
-        {
-          size: 'XL',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'XXL',
-          color: 'Red',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'M',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-      ],
-    },
-    {
-      id: 1,
-      name: 'Product 1',
-      mainImageUrl: '',
-      price: 431999,
-      inventory: 10,
-      categoryId: '3asd-12as',
-      categoryName: 'Quần',
-      productVariants: [
-        {
-          size: 'XL',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'XXL',
-          color: 'Red',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'M',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-      ],
-    },
-    {
-      id: 1,
-      name: 'Product 1',
-      mainImageUrl: '',
-      price: 431999,
-      inventory: 10,
-      categoryId: '3asd-12as',
-      categoryName: 'Quần',
-      productVariants: [
-        {
-          size: 'XL',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'XXL',
-          color: 'Red',
-          price: 120,
-          inventory: 10,
-        },
-        {
-          size: 'M',
-          color: 'black',
-          price: 120,
-          inventory: 10,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Product 2',
-      mainImageUrl: '',
-      price: 120000,
-      inventory: 100,
-      categoryId: '3asd-12as',
-      categoryName: 'Áo',
-      productVariants: [
-        {
-          size: 'XL',
-          color: 'black',
-          price: 120000,
-          inventory: 10,
-        },
-      ],
-    },
-  ]);
+  const [products, setProducts] = useState<ProductDto[]>([]);
+
+  const handleDeleteProduct = async (id: string) => {
+    const productServices = new ProductService();
+    setLoading(true);
+    const res = await productServices.Delete(id);
+    if (res.isSucceeded) {
+      handleFilter();
+    } else {
+      toast?.ShowToast({
+        severity: 'error',
+        description: res.message,
+        autoHideDuration: 3000,
+        title: 'Xóa thất bại',
+      });
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const productServices = new ProductService();
+      const productCategoryService = new ProductCategoryService();
+      productCategoryService.GetAll().then((res) => {
+        setcategories(res.data ?? []);
+      });
+      const res = await productServices.GetAll(optionFilter);
+      if (res.isSucceeded) {
+        setProducts(res.data ?? []);
+        settotalRecordsCount(res.totalRecordsCount ?? 0);
+      } else {
+        setmessageErr(res.message ?? 'Error');
+      }
+    };
+    setLoading(true);
+    fetchProducts().finally(() => {
+      setLoading(false);
+    });
+  }, []);
 
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Danh sách sản phẩm </Typography>
+        <Typography variant="h4">Danh sách sản phẩm</Typography>
         <Button
           variant="contained"
           color="primary"
@@ -219,8 +148,8 @@ export default function ProductsView() {
             flex: 8,
           }}
           onChange={(event) => {
-            setOptionPagination({
-              ...optionPagination,
+            setoptionFilter({
+              ...optionFilter,
               name: event.target.value,
             });
           }}
@@ -234,8 +163,8 @@ export default function ProductsView() {
             flex: 3,
           }}
           onChange={(event: any) => {
-            setOptionPagination({
-              ...optionPagination,
+            setoptionFilter({
+              ...optionFilter,
               priceMin: event.target.value ? parseInt(event.target.value) : null,
             });
           }}
@@ -249,8 +178,8 @@ export default function ProductsView() {
             flex: 3,
           }}
           onChange={(event: any) => {
-            setOptionPagination({
-              ...optionPagination,
+            setoptionFilter({
+              ...optionFilter,
               priceMax: event.target.value ? parseInt(event.target.value) : null,
             });
           }}
@@ -264,10 +193,9 @@ export default function ProductsView() {
         >
           <InputLabel>Trạng thái</InputLabel>
           <Select
-            value={optionPagination.status}
             onChange={(event: SelectChangeEvent) => {
-              setOptionPagination({
-                ...optionPagination,
+              setoptionFilter({
+                ...optionFilter,
                 status: parseInt(event.target.value),
               });
             }}
@@ -285,10 +213,10 @@ export default function ProductsView() {
         >
           <InputLabel>Loại sản phẩm</InputLabel>
           <Select
-            value={optionPagination.categoryId}
+            value={optionFilter.categoryId || ''}
             onChange={(event: SelectChangeEvent) => {
-              setOptionPagination({
-                ...optionPagination,
+              setoptionFilter({
+                ...optionFilter,
                 categoryId: event.target.value,
               });
             }}
@@ -302,9 +230,7 @@ export default function ProductsView() {
         </FormControl>
 
         <Button
-          onClick={() => {
-            console.log(optionPagination);
-          }}
+          onClick={handleFilter}
           variant="contained"
           color="success"
           sx={{
@@ -372,134 +298,164 @@ export default function ProductsView() {
               </Box>
             </Box>
           </Box>
-          <Box className="list-products" sx={{ marginTop: 2 }}>
-            {products.map((product, index) => {
-              return (
-                <>
-                  <Box
-                    key={index}
-                    className="row"
-                    sx={{ backgroundColor: '#fff', borderBottom: '1px solid #b0aeae' }}
-                  >
+          <Box className="list-products" sx={{ marginTop: 2, textAlign: 'center' }}>
+            {loading ? (
+              <CircularProgress sx={{ margin: '0 45%' }} />
+            ) : products.length == 0 ? (
+              'Không tìm thấy sản phẩm'
+            ) : (
+              products.map((product, index) => {
+                return (
+                  <>
                     <Box
-                      className="cell"
-                      sx={{ width: 10, cursor: 'pointer' }}
-                      onClick={() => {
-                        product.isActive = !product.isActive;
-                        setProducts([...products]);
-                      }}
+                      key={index}
+                      className="row"
+                      sx={{ backgroundColor: '#fff', borderBottom: '1px solid #b0aeae' }}
                     >
-                      {product.isActive ? <KeyboardArrowDownIcon /> : <ChevronRightIcon />}
-                    </Box>
-
-                    <Box className="cell" sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}>
-                      <p>{index + 1}</p>
-                    </Box>
-                    <Box
-                      component="img"
-                      src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
-                      sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
-                      alt="Quảng cáo"
-                    />
-                    <Box className="cell" sx={{ flex: 6 }}>
-                      {product.name}
-                    </Box>
-                    <Box className="cell" sx={{ flex: 2 }}>
-                      {product.isActive ? 'Active' : 'inActive'}
-                    </Box>
-                    <Box className="cell" sx={{ flex: 2 }}></Box>
-                    <Box className="cell" sx={{ flex: 4 }}>
-                      {product.categoryName}
-                    </Box>
-                    <Box className="cell" sx={{ flex: 3 }}>
-                      {product.price.toLocaleString('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                      })}
-                    </Box>
-                    <Box className="cell" sx={{ flex: 2 }}>
-                      {product.inventory}
-                    </Box>
-                    <Box className="cell" sx={{ flex: 2 }}>
                       <Box
-                        className="button-action"
+                        className="cell"
+                        sx={{ width: 10, cursor: 'pointer' }}
                         onClick={() => {
-                          router.replace(`/dashboard/product/product-detail/${product.id}`);
+                          product.isActive = !product.isActive;
+                          setProducts([...products]);
                         }}
                       >
-                        Xem
+                        {product.isActive ? <KeyboardArrowDownIcon /> : <ChevronRightIcon />}
                       </Box>
-                      <Box className="button-action">Xóa</Box>
-                    </Box>
-                  </Box>
-                  {product.isActive
-                    ? product.productVariants.map((v) => {
-                        return (
-                          <Box key={index * 2 + 3} className="row" sx={{ marginTop: '5px' }}>
-                            <Box className="cell"></Box>
 
-                            <Box
-                              className="cell"
-                              sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}
-                            ></Box>
-                            <Box
-                              component="img"
-                              src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
-                              sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
-                              alt="Quảng cáo"
-                            />
-                            <Box className="cell" sx={{ flex: 6 }}></Box>
-                            <Box className="cell" sx={{ flex: 2 }}>
-                              {v.size}
+                      <Box className="cell" sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}>
+                        <p>{index + 1}</p>
+                      </Box>
+                      <Box
+                        component="img"
+                        src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
+                        sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
+                        alt="Quảng cáo"
+                      />
+                      <Box className="cell" sx={{ flex: 6 }}>
+                        {product.name}
+                      </Box>
+                      <Box className="cell" sx={{ flex: 2 }}></Box>
+                      <Box className="cell" sx={{ flex: 2 }}></Box>
+                      <Box className="cell" sx={{ flex: 4 }}>
+                        {product.categoryName}
+                      </Box>
+                      <Box className="cell" sx={{ flex: 3 }}>
+                        {/* {product.price.toLocaleString('vi-VN', {
+                        style: 'currency',
+                        currency: 'VND',
+                      })} */}
+                      </Box>
+                      <Box className="cell" sx={{ flex: 2 }}>
+                        {(product.productVariants ?? []).reduce(
+                          (accumulator, currentValue) =>
+                            accumulator + (currentValue.inventory ?? 0),
+                          0
+                        )}
+                      </Box>
+                      <Box className="cell" sx={{ flex: 2 }}>
+                        <Box
+                          className="button-action"
+                          onClick={() => {
+                            router.replace(`/dashboard/product/product-detail/${product.id}`);
+                          }}
+                        >
+                          <EditIcon />
+                        </Box>
+                        <Box className="button-action">
+                          <DeleteIcon
+                            onClick={() => {
+                              setidDelete(product.id ?? '');
+                              setOpen(true);
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    </Box>
+                    {product.isActive
+                      ? (product.productVariants ?? []).map((v) => {
+                          return (
+                            <Box key={index * 2 + 3} className="row" sx={{ marginTop: '5px' }}>
+                              <Box className="cell"></Box>
+
+                              <Box
+                                className="cell"
+                                sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}
+                              ></Box>
+                              <Box
+                                component="img"
+                                src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
+                                sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
+                                alt="Quảng cáo"
+                              />
+                              <Box className="cell" sx={{ flex: 6 }}></Box>
+                              <Box className="cell" sx={{ flex: 2 }}>
+                                {v.size}
+                              </Box>
+                              <Box className="cell" sx={{ flex: 2 }}>
+                                {v.color}
+                              </Box>
+                              <Box className="cell" sx={{ flex: 4 }} />
+                              <Box className="cell" sx={{ flex: 3 }}>
+                                {v.price
+                                  ? v.price.toLocaleString('vi-VN', {
+                                      style: 'currency',
+                                      currency: 'VND',
+                                    })
+                                  : 0}
+                              </Box>
+                              <Box className="cell" sx={{ flex: 2 }}>
+                                {v.inventory}
+                              </Box>
+                              <Box className="cell" sx={{ flex: 2 }}>
+                                {''}
+                              </Box>
                             </Box>
-                            <Box className="cell" sx={{ flex: 2 }}>
-                              {v.color}
-                            </Box>
-                            <Box className="cell" sx={{ flex: 4 }} />
-                            <Box className="cell" sx={{ flex: 3 }}>
-                              {v.price.toLocaleString('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND',
-                              })}
-                            </Box>
-                            <Box className="cell" sx={{ flex: 2 }}>
-                              {v.inventory}
-                            </Box>
-                            <Box className="cell" sx={{ flex: 2 }}></Box>
-                          </Box>
-                        );
-                      })
-                    : null}
-                </>
-              );
-            })}
+                          );
+                        })
+                      : null}
+                  </>
+                );
+              })
+            )}
+
             <TablePagination
               component="div"
               rowsPerPageOptions={[5, 10, 15]}
-              rowsPerPage={optionPagination.pageSize}
-              page={optionPagination.pageIndex - 1}
+              rowsPerPage={optionFilter.pageSize}
+              page={optionFilter.pageIndex - 1}
               onPageChange={(e, newPage) => {
-                setOptionPagination({
-                  ...optionPagination,
+                setoptionFilter({
+                  ...optionFilter,
                   pageIndex: newPage + 1,
                 });
               }}
               onRowsPerPageChange={(
                 event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
               ) => {
-                setOptionPagination({
-                  ...optionPagination,
+                setoptionFilter({
+                  ...optionFilter,
                   pageSize: parseInt(event.target.value, 10),
                   pageIndex: 1,
                 });
               }}
               labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count}`}
               labelRowsPerPage="Số sản phẩm/trang"
-              count={optionPagination.totalRows}
+              count={totalRecordsCount}
             />
           </Box>
         </Box>
       </Box>
+
+      <AlertDialog
+        isOpen={open}
+        labelAgree="Xác nhận"
+        labelDisagree="Hủy"
+        handleAgree={handleAgree}
+        handleDisagree={handleDisagree}
+        description="abc"
+        title="Xác nhận xóa"
+      />
     </Container>
   );
 }

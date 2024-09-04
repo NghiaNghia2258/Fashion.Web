@@ -57,6 +57,8 @@ export type JWTContextType = CanRemove & {
   logout: () => Promise<void>;
 };
 
+export type ToastDashboardContext = CanRemove & {};
+
 export type FirebaseContextType = CanRemove & {
   user: AuthUserType;
   method: string;
