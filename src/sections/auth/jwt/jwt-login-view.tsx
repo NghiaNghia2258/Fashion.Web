@@ -17,18 +17,19 @@ import { useRouter, useSearchParams } from 'src/routes/hooks';
 
 import { useBoolean } from 'src/hooks/use-boolean';
 
-import { useAuthContext } from 'src/auth/hooks';
 import { PATH_AFTER_LOGIN } from 'src/config-global';
 
 import Iconify from 'src/components/iconify';
 import FormProvider, { RHFTextField } from 'src/components/hook-form';
+import { UserLoginDto } from 'src/sevices/DTOs/user-login-dto';
+import AuthenService from 'src/sevices/api/auth-services';
+import { setSession } from 'src/auth/context/jwt/utils';
 
 // ----------------------------------------------------------------------
 
 export default function JwtLoginView() {
-  const { login } = useAuthContext();
-
   const router = useRouter();
+  const [userLogin, setUserLogin] = useState<UserLoginDto>({});
 
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -37,6 +38,18 @@ export default function JwtLoginView() {
   const returnTo = searchParams.get('returnTo');
 
   const password = useBoolean();
+
+  const handleLogin = async () => {
+    console.log(userLogin);
+    const authenService = new AuthenService();
+    const res = await authenService.Login(userLogin);
+    if (res.isSucceeded) {
+      setSession(res.data?.accessToken);
+      router.push(returnTo || PATH_AFTER_LOGIN);
+    } else {
+      setErrorMsg(res.message ?? '');
+    }
+  };
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string().required('Email is required').email('Email must be a valid email address'),
@@ -51,24 +64,6 @@ export default function JwtLoginView() {
   const methods = useForm({
     resolver: yupResolver(LoginSchema),
     defaultValues,
-  });
-
-  const {
-    reset,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = methods;
-
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      await login?.(data.email, data.password);
-
-      router.push(returnTo || PATH_AFTER_LOGIN);
-    } catch (error) {
-      console.error(error);
-      reset();
-      setErrorMsg(typeof error === 'string' ? error : error.message);
-    }
   });
 
   const renderHead = (
@@ -87,9 +82,26 @@ export default function JwtLoginView() {
 
   const renderForm = (
     <Stack spacing={2.5}>
-      <RHFTextField name="email" label="Email address" />
+      <RHFTextField
+        name="email"
+        label="Email address"
+        value={userLogin.username ?? ''}
+        onChange={(e) => {
+          setUserLogin({
+            ...userLogin,
+            username: e.target.value,
+          });
+        }}
+      />
 
       <RHFTextField
+        onChange={(e) => {
+          setUserLogin({
+            ...userLogin,
+            password: e.target.value,
+          });
+        }}
+        value={userLogin.password ?? ''}
         name="password"
         label="Password"
         type={password.value ? 'text' : 'password'}
@@ -105,16 +117,18 @@ export default function JwtLoginView() {
       />
 
       <Link variant="body2" color="inherit" underline="always" sx={{ alignSelf: 'flex-end' }}>
-        Forgot password?
+        Quên mật khẩu ?
       </Link>
 
       <LoadingButton
         fullWidth
         color="inherit"
         size="large"
-        type="submit"
         variant="contained"
-        loading={isSubmitting}
+        onClick={async (e) => {
+          e.preventDefault();
+          await handleLogin();
+        }}
       >
         Login
       </LoadingButton>
@@ -135,7 +149,7 @@ export default function JwtLoginView() {
         </Alert>
       )}
 
-      <FormProvider methods={methods} onSubmit={onSubmit}>
+      <FormProvider methods={methods} onSubmit={() => {}}>
         {renderForm}
       </FormProvider>
     </>

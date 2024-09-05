@@ -78,10 +78,9 @@ export default function ProductsView() {
 
   const handleDeleteProduct = async (id: string) => {
     const productServices = new ProductService();
-    setLoading(true);
     const res = await productServices.Delete(id);
     if (res.isSucceeded) {
-      handleFilter();
+      setProducts(products.filter((obj) => obj.id !== id));
     } else {
       toast?.ShowToast({
         severity: 'error',
@@ -90,7 +89,6 @@ export default function ProductsView() {
         title: 'Xóa thất bại',
       });
     }
-    setLoading(false);
   };
 
   useEffect(() => {

@@ -30,11 +30,10 @@ export default function AuthGuard({ children }: Props) {
 function Container({ children }: Props) {
   const router = useRouter();
 
-  const { authenticated, method } = useAuthContext();
-
-  const [checked, setChecked] = useState(false);
+  const { method } = useAuthContext();
 
   const check = useCallback(() => {
+    const authenticated = sessionStorage.getItem('accessToken');
     if (!authenticated) {
       const searchParams = new URLSearchParams({
         returnTo: window.location.pathname,
@@ -45,19 +44,12 @@ function Container({ children }: Props) {
       const href = `${loginPath}?${searchParams}`;
 
       router.replace(href);
-    } else {
-      setChecked(true);
     }
-  }, [authenticated, method, router]);
+  }, [method, router]);
 
   useEffect(() => {
     check();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  if (!checked) {
-    return null;
-  }
 
   return <>{children}</>;
 }

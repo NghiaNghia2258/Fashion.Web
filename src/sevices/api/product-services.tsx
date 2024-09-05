@@ -130,6 +130,7 @@ export default class ProductService {
     }
   }
   async Create(product: ProductDto): Promise<ApiResult<boolean>> {
+    console.log(product);
     await delay(2000);
     const response = {
       isSucceeded: false,
@@ -164,9 +165,9 @@ export default class ProductService {
     }
   }
   async Delete(id: string): Promise<ApiResult<boolean>> {
-    await delay(2000);
+    await delay(500);
     const response = {
-      isSucceeded: false,
+      isSucceeded: true,
       message: 'Sản phẩm không tồn tại',
     };
     if (response.isSucceeded) {

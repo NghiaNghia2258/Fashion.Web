@@ -30,6 +30,8 @@ import { DashboardContext } from 'src/layouts/dashboard';
 import ProductService from 'src/sevices/api/product-services';
 import { ProductDto } from 'src/sevices/DTOs/product-dto';
 import { SplashScreen } from 'src/components/loading-screen';
+import ProductCategoryService from 'src/sevices/api/product-category-services';
+import { ProductCategoryDto } from 'src/sevices/DTOs/product-category-dto';
 
 // ----------------------------------------------------------------------
 
@@ -37,24 +39,27 @@ export default function CreateProductView() {
   const settings = useSettingsContext();
   const router = useRouter();
   const toast = useContext(DashboardContext);
-
-  const [sizes, setsizes] = useState<string[]>([]);
-  const [colors, setcolors] = useState<string[]>([]);
-  const [price, setprice] = useState<number>(0);
   const [loading, setloading] = useState<boolean>(false);
-  const [isErrInputName, setisErrInputName] = useState<boolean>(false);
-  const [isErrInputDes, setisErrInputDes] = useState<boolean>(false);
-  const [inventory, setinventory] = useState<number>(0);
-  const [images, setImages] = useState<File[]>([]);
-  const [details, setdetails] = useState<any[]>([]);
-  const [isOpenDialogCreate, setisOpenDialogCreate] = useState(false);
-  const [isOpenDialogCancel, setisOpenDialogCancel] = useState(false);
+  const [categories, setcategories] = useState<ProductCategoryDto[]>([]);
   const [newProduct, setnewProduct] = useState<ProductDto>({
     name: '',
     mainImageUrl: '',
     categoryId: '',
     productVariants: [],
   });
+
+  const [isErrInputName, setisErrInputName] = useState<boolean>(false);
+  const [isErrInputDes, setisErrInputDes] = useState<boolean>(false);
+
+  const [sizes, setsizes] = useState<string[]>([]);
+  const [colors, setcolors] = useState<string[]>([]);
+  const [price, setprice] = useState<number>(0);
+  const [inventory, setinventory] = useState<number>(0);
+  const [images, setImages] = useState<File[]>([]);
+  const [details, setdetails] = useState<any[]>([]);
+
+  const [isOpenDialogCreate, setisOpenDialogCreate] = useState(false);
+  const [isOpenDialogCancel, setisOpenDialogCancel] = useState(false);
 
   const handleDisagree = () => {
     setisOpenDialogCreate(false);
@@ -65,6 +70,7 @@ export default function CreateProductView() {
     setisOpenDialogCreate(false);
 
     const productServices = new ProductService();
+    newProduct.productVariants = details;
     const res = await productServices.Create(newProduct);
     setloading(false);
     if (res.isSucceeded) {
@@ -122,10 +128,12 @@ export default function CreateProductView() {
     {
       field: 'price',
       headerName: 'Giá bán',
+      editable: true,
     },
     {
       field: 'inventory',
       headerName: 'Tồn kho',
+      editable: true,
     },
   ];
 
@@ -168,20 +176,13 @@ export default function CreateProductView() {
     setdetails(newDetails);
   }, [sizes, colors]);
 
-  const [categories, setcategories] = useState([
-    {
-      id: '1asd-12as',
-      name: 'Áo',
-    },
-    {
-      id: '2asd-12as',
-      name: 'Quần',
-    },
-    {
-      id: '3asd-12as',
-      name: 'Giày',
-    },
-  ]);
+  useEffect(() => {
+    const productCategoryService = new ProductCategoryService();
+    productCategoryService.GetAll().then((res) => {
+      setcategories(res.data ?? []);
+    });
+  }, []);
+
   return (
     <Container
       maxWidth={settings.themeStretch ? false : 'xl'}
@@ -264,7 +265,7 @@ export default function CreateProductView() {
                 }}
               >
                 <Typography sx={{ marginBottom: '5px', fontSize: '16px', fontWeight: 700 }}>
-                  Tên sản phẩm
+                  Tên sản phẩm <span style={{ color: 'red' }}>*</span>
                 </Typography>
                 <TextField
                   error={isErrInputName}
@@ -299,7 +300,7 @@ export default function CreateProductView() {
                 >
                   <InputLabel>Loại sản phẩm</InputLabel>
                   <Select
-                    value={''}
+                    value={newProduct.categoryId}
                     onChange={(event: SelectChangeEvent) => {
                       setnewProduct({ ...newProduct, categoryId: event.target.value });
                     }}
@@ -520,6 +521,9 @@ export default function CreateProductView() {
                 }}
               >
                 <DataGrid
+                  onCellEditStart={(details) => {
+                    console.log({ details });
+                  }}
                   rows={details}
                   columns={columns}
                   initialState={{
@@ -553,7 +557,7 @@ export default function CreateProductView() {
               borderBottom: '1px solid #919eabcc',
             }}
           >
-            Hình ảnh sản phẩm
+            Hình ảnh sản phẩm <span style={{ color: 'red' }}>*</span>
           </Typography>
           <Box sx={{ padding: '10px', display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {images.map((image) => {
