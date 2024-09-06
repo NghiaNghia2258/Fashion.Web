@@ -40,7 +40,7 @@ export default function OrdersView() {
           <Box
             sx={{
               textAlign: 'center',
-              fontSize: '15px',
+              fontSize: '14px',
               borderRadius: 1,
               width: '75%',
               padding: '3px 0',
@@ -56,7 +56,7 @@ export default function OrdersView() {
           <Box
             sx={{
               textAlign: 'center',
-              fontSize: '15px',
+              fontSize: '14px',
               borderRadius: 1,
               width: '75%',
               padding: '3px 0',
@@ -72,7 +72,7 @@ export default function OrdersView() {
           <Box
             sx={{
               textAlign: 'center',
-              fontSize: '15px',
+              fontSize: '14px',
               borderRadius: 1,
               width: '75%',
               padding: '3px 0',
@@ -88,7 +88,7 @@ export default function OrdersView() {
           <Box
             sx={{
               textAlign: 'center',
-              fontSize: '15px',
+              fontSize: '14px',
               borderRadius: 1,
               width: '75%',
               padding: '3px 0',
@@ -104,7 +104,7 @@ export default function OrdersView() {
           <Box
             sx={{
               textAlign: 'center',
-              fontSize: '15px',
+              fontSize: '14px',
               borderRadius: 1,
               width: '75%',
               padding: '3px 0',
@@ -120,7 +120,7 @@ export default function OrdersView() {
           <Box
             sx={{
               textAlign: 'center',
-              fontSize: '15px',
+              fontSize: '14px',
               borderRadius: 1,
               width: '75%',
               padding: '3px 0',

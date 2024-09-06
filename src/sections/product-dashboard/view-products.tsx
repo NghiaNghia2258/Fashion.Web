@@ -507,7 +507,7 @@ export default function ProductsView() {
                   pageIndex: 1,
                 });
               }}
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count}`}
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
               labelRowsPerPage="Số sản phẩm/trang"
               count={totalRecordsCount}
             />
