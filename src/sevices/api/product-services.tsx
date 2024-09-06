@@ -127,7 +127,8 @@ export default class ProductService {
             size: 'M',
             color: 'Red',
             price: 199999,
-            imageUrl: 'https://example.com/images/tshirt-red-m.jpg',
+            imageUrl:
+              'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
             inventory: 50,
           },
           {
@@ -135,8 +136,20 @@ export default class ProductService {
             size: 'L',
             color: 'Blue',
             price: 229999,
-            imageUrl: 'https://example.com/images/tshirt-blue-l.jpg',
+            imageUrl: null,
             inventory: 30,
+          },
+        ],
+        productImages: [
+          {
+            id: '103',
+            imageUrl:
+              'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
+          },
+          {
+            id: '104',
+            imageUrl:
+              'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
           },
         ],
       },
@@ -173,6 +186,7 @@ export default class ProductService {
     }
   }
   async Update(product: ProductDto): Promise<ApiResult<boolean>> {
+    console.log(product);
     await delay(2000);
     const response = {
       isSucceeded: true,

@@ -5,4 +5,5 @@ export interface ProductImageDto {
   imageUrl?: string; // Thuộc tính ImageUrl
   productId?: string; // Tùy chọn (có thể null)
   product?: ProductDto; // Tùy chọn (có thể null)
+  isDeleted?: boolean;
 }

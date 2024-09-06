@@ -31,6 +31,7 @@ import ProductCategoryService from 'src/sevices/api/product-category-services';
 import { ProductCategoryDto } from 'src/sevices/DTOs/product-category-dto';
 import { ProductVariantDto } from 'src/sevices/DTOs/product-variant-dto';
 import UploadService from 'src/sevices/api/upload-services';
+import { ProductImageDto } from 'src/sevices/DTOs/product-image-dto';
 // ----------------------------------------------------------------------
 
 export default function ProductDetailView() {
@@ -42,6 +43,7 @@ export default function ProductDetailView() {
   const [categories, setcategories] = useState<ProductCategoryDto[]>([]);
   const [newProduct, setnewProduct] = useState<ProductDto>({});
   const [productGetById, setProductGetById] = useState<ProductDto>({});
+  const [productImages, setProductImages] = useState<ProductImageDto[]>([]);
 
   const [isErrInputName, setisErrInputName] = useState<boolean>(false);
   const [isErrInputDes, setisErrInputDes] = useState<boolean>(false);
@@ -63,14 +65,17 @@ export default function ProductDetailView() {
   const handleCreateProduct = async () => {
     setloading(true);
     const uploadServices = new UploadService();
-    newProduct.productVariants = await Promise.all(
+    productGetById.productVariants = await Promise.all(
       details.map(async (detail) => {
+        if (!detail.fileImage) {
+          return { ...detail };
+        }
         const urlImaage = await uploadServices.UploadImage(detail.fileImage);
         return { ...detail, imageUrl: urlImaage, fileImage: undefined };
       })
     );
 
-    newProduct.productImages = await Promise.all(
+    productGetById.productImages = await Promise.all(
       images.map(async (img) => {
         const urlImaage = await uploadServices.UploadImage(img);
         return {
@@ -78,14 +83,15 @@ export default function ProductDetailView() {
         };
       })
     );
-    newProduct.mainImageUrl = newProduct.productImages[0].imageUrl;
+    productGetById.productImages = [...productGetById.productImages, ...productImages];
+    productGetById.mainImageUrl = productGetById.productImages[0].imageUrl;
     const productServices = new ProductService();
-    const res = await productServices.Create(newProduct);
+    const res = await productServices.Update(productGetById);
     setloading(false);
     if (res.isSucceeded) {
       toast?.ShowToast({
         severity: 'success',
-        description: 'Tạo sản phẩm thành công!',
+        description: 'Sửa sản phẩm thành công!',
         autoHideDuration: 3000,
         title: 'Thành công',
       });
@@ -174,6 +180,7 @@ export default function ProductDetailView() {
     const productService = new ProductService();
     productService.GetById(params.id ?? '').then((res) => {
       setProductGetById(res.data ?? {});
+      setProductImages(res.data?.productImages ?? []);
       setdetails(res.data?.productVariants ?? []);
     });
   }, []);
@@ -516,8 +523,38 @@ export default function ProductDetailView() {
                           alignItems: 'center',
                         }}
                       >
-                        <Box flex={2}>
-                          {detail.fileImage ? (
+                        <Box
+                          flex={2}
+                          sx={{
+                            '& img': {
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '10px',
+                              cursor: 'pointer',
+                              border: '1px solid #919eabcc',
+                            },
+                          }}
+                        >
+                          {detail.imageUrl ? (
+                            <InputFile
+                              onClick={() => {
+                                setdetails(
+                                  details.map((obj) => {
+                                    if (obj.id === detail.id) {
+                                      return {
+                                        ...detail,
+                                        imageUrl: undefined,
+                                      };
+                                    } else {
+                                      return obj;
+                                    }
+                                  })
+                                );
+                              }}
+                              file={detail.imageUrl ?? ''}
+                              imageView
+                            />
+                          ) : detail.fileImage ? (
                             <InputFile
                               onClick={() => {
                                 setdetails(
@@ -599,8 +636,53 @@ export default function ProductDetailView() {
                             </Box>
                           )}
                         </Box>
-                        <Box flex={2}>{detail.size}</Box>
-                        <Box flex={2}>{detail.color}</Box>
+                        <Box flex={2}>
+                          <TextField
+                            sx={{ width: '80%' }}
+                            type="text"
+                            variant="standard"
+                            size="small"
+                            value={detail.size}
+                            onChange={(event: any) => {
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      size: event.target.value,
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            }}
+                          />
+                        </Box>
+                        <Box flex={2}>
+                          {' '}
+                          <TextField
+                            sx={{ width: '80%' }}
+                            type="text"
+                            variant="standard"
+                            size="small"
+                            value={detail.color}
+                            onChange={(event: any) => {
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      color: event.target.value,
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            }}
+                          />
+                        </Box>
                         <Box flex={3}>
                           <TextField
                             sx={{ width: '80%' }}
@@ -682,6 +764,31 @@ export default function ProductDetailView() {
                       </Box>
                     );
                   })}
+                  <Box
+                    onClick={() => {
+                      const newDetail = {
+                        id: (details.length + 1).toLocaleString(),
+                        size: '',
+                        color: '',
+                        price: 0,
+                        inventory: 0,
+                        fileImage: null,
+                      };
+                      setdetails([...details, newDetail]);
+                    }}
+                    sx={{
+                      marginTop: '5px',
+                      fontSize: '28px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      backgroundColor: '#e4e8edf0',
+                      '&:hover': {
+                        opacity: 0.8,
+                      },
+                    }}
+                  >
+                    +
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -705,7 +812,39 @@ export default function ProductDetailView() {
           >
             Hình ảnh sản phẩm <span style={{ color: 'red' }}>*</span>
           </Typography>
-          <Box sx={{ padding: '10px', display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Box
+            sx={{
+              padding: '10px',
+              display: 'flex',
+              gap: 1,
+              flexWrap: 'wrap',
+              '& img': {
+                width: '100px',
+                height: '100px',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                border: '1px solid #919eabcc',
+              },
+            }}
+          >
+            {productImages.map((image, index) => {
+              if (!image.isDeleted) {
+                return (
+                  <InputFile
+                    key={index}
+                    onClick={() => {
+                      console.log(productImages);
+                      const updatedImages = productImages.map((img, i) =>
+                        image.id === img.id ? { ...img, isDeleted: true } : img
+                      );
+                      setProductImages(updatedImages);
+                    }}
+                    file={image.imageUrl ?? ''}
+                    imageView
+                  />
+                );
+              }
+            })}
             {images.map((image, index) => {
               return (
                 <InputFile
@@ -713,7 +852,7 @@ export default function ProductDetailView() {
                     setImages(images.filter((_, i) => i !== index));
                   }}
                   file={image}
-                  imageView={true}
+                  imageView
                   sx={{
                     width: '100px',
                     height: '100px',
