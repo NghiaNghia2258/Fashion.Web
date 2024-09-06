@@ -1,5 +1,3 @@
-import * as axios from '../axios-instance/axios-host1';
-
 import { ProductDto } from '../DTOs/product-dto';
 import { OptionFilterProduct } from '../paramas/option-filter-product';
 import { ApiResult } from './api-result';
@@ -9,8 +7,6 @@ function delay(ms: number): Promise<void> {
 }
 
 export default class ProductService {
-  constructor() {}
-
   async GetAll(options: OptionFilterProduct): Promise<ApiResult<ProductDto[]>> {
     //const response = await axios.post('/products', { params: options });
     await delay(2000);
@@ -34,7 +30,7 @@ export default class ProductService {
               color: 'Red',
               price: 199999,
               imageUrl: 'https://example.com/images/tshirt-red-m.jpg',
-              inventory: 50,
+              inventory: 0,
             },
             {
               id: '102',
@@ -65,6 +61,35 @@ export default class ProductService {
             },
           ],
         },
+        {
+          id: '3',
+          name: 'Shoes',
+          nameEn: 'Shoes',
+          description: 'Comfortable sneakers.',
+          mainImageUrl: 'https://example.com/images/shoes.jpg',
+          categoryId: '11',
+          categoryName: 'Footwear',
+          productVariants: [
+            {
+              id: '301',
+              size: '10',
+              color: 'Black',
+              price: 399999,
+              imageUrl: 'https://example.com/images/shoes-black-10.jpg',
+              inventory: 0,
+            },
+          ],
+        },
+        {
+          id: '4',
+          name: 'Accessories',
+          nameEn: 'Accessories',
+          description: 'Handmade accessories.',
+          mainImageUrl: 'https://example.com/images/accessories.jpg',
+          categoryId: '12',
+          categoryName: 'Accessories',
+          productVariants: [],
+        },
       ],
     };
     if (response.isSucceeded) {
@@ -94,7 +119,7 @@ export default class ProductService {
         nameEn: 'T-Shirt',
         description: 'A comfortable cotton t-shirt.',
         mainImageUrl: 'https://example.com/images/tshirt.jpg',
-        categoryId: '10',
+        categoryId: '2',
         categoryName: 'Apparel',
         productVariants: [
           {

@@ -15,6 +15,8 @@ import TablePagination from '@mui/material/TablePagination';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 import { useSettingsContext } from 'src/components/settings';
 import { useContext, useEffect, useState } from 'react';
@@ -116,14 +118,39 @@ export default function ProductsView() {
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4">Danh sách sản phẩm</Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => router.replace('/dashboard/product/create-product')}
+
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
         >
-          Thêm sản phẩm mới
-          <ChevronRightIcon fontSize="small" />
-        </Button>
+          <Button
+            sx={{ height: '36px' }}
+            onClick={() => {}}
+            variant="contained"
+            color="info"
+            startIcon={<FileUploadIcon />}
+            size="small"
+          >
+            Import Excel
+          </Button>
+          <Button
+            sx={{ height: '36px' }}
+            onClick={() => {}}
+            variant="contained"
+            color="info"
+            startIcon={<FileDownloadIcon />}
+            size="small"
+          >
+            Export Excel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => router.replace('/dashboard/product/create-product')}
+          >
+            Thêm sản phẩm mới
+            <ChevronRightIcon fontSize="small" />
+          </Button>
+        </Box>
       </Box>
 
       <Box
@@ -291,7 +318,10 @@ export default function ProductsView() {
               <Box className="cell" sx={{ flex: 2 }}>
                 Tồn kho
               </Box>
-              <Box className="cell" sx={{ flex: 2 }}>
+              <Box className="cell" sx={{ flex: 3 }}>
+                Trạng thái
+              </Box>
+              <Box className="cell" sx={{ flex: 3 }}>
                 Thao tác
               </Box>
             </Box>
@@ -351,7 +381,32 @@ export default function ProductsView() {
                           0
                         )}
                       </Box>
-                      <Box className="cell" sx={{ flex: 2 }}>
+                      <Box className="cell" sx={{ flex: 3 }}>
+                        <Box
+                          sx={{
+                            ...((product.productVariants ?? []).reduce(
+                              (accumulator, currentValue) =>
+                                accumulator + (currentValue.inventory ?? 0),
+                              0
+                            ) === 0
+                              ? { border: '3px solid #f44336', color: '#f44336' }
+                              : { border: '3px solid #4caf50', color: '#4caf50' }),
+                            fontSize: '13px',
+                            padding: '3px 7px',
+                            width: '100%',
+                            borderRadius: '5px',
+                          }}
+                        >
+                          {(product.productVariants ?? []).reduce(
+                            (accumulator, currentValue) =>
+                              accumulator + (currentValue.inventory ?? 0),
+                            0
+                          ) === 0
+                            ? 'Hết hàng'
+                            : 'Còn hàng'}
+                        </Box>
+                      </Box>
+                      <Box className="cell" sx={{ flex: 3 }}>
                         <Box
                           className="button-action"
                           onClick={() => {
@@ -405,7 +460,22 @@ export default function ProductsView() {
                               <Box className="cell" sx={{ flex: 2 }}>
                                 {v.inventory}
                               </Box>
-                              <Box className="cell" sx={{ flex: 2 }}>
+                              <Box className="cell" sx={{ flex: 3 }}>
+                                <Box
+                                  sx={{
+                                    ...(v.inventory === 0
+                                      ? { border: '3px solid #f44336', color: '#f44336' }
+                                      : { border: '3px solid #4caf50', color: '#4caf50' }),
+                                    fontSize: '13px',
+                                    padding: '3px 7px',
+                                    width: '100%',
+                                    borderRadius: '5px',
+                                  }}
+                                >
+                                  {v.inventory === 0 ? 'Hết hàng' : 'Còn hàng'}
+                                </Box>
+                              </Box>
+                              <Box className="cell" sx={{ flex: 3 }}>
                                 {''}
                               </Box>
                             </Box>

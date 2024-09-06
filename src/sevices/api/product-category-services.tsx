@@ -6,7 +6,6 @@ function delay(ms: number): Promise<void> {
 }
 export default class ProductCategoryService {
   async GetAll(): Promise<ApiResult<ProductCategoryDto[]>> {
-    await delay(10000);
     const response = {
       isSucceeded: true,
       message: '',

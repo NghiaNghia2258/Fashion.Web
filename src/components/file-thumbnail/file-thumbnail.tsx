@@ -13,6 +13,7 @@ type FileIconProps = {
   tooltip?: boolean;
   imageView?: boolean;
   onDownload?: VoidFunction;
+  onClick?: VoidFunction;
   sx?: SxProps<Theme>;
   imgSx?: SxProps<Theme>;
 };
@@ -22,6 +23,7 @@ export default function FileThumbnail({
   tooltip,
   imageView,
   onDownload,
+  onClick,
   sx,
   imgSx,
 }: FileIconProps) {
@@ -29,11 +31,10 @@ export default function FileThumbnail({
 
   const format = fileFormat(path || preview);
 
-  console.log(fileData(file));
-
   const renderContent =
     format === 'image' && imageView ? (
       <Box
+        onClick={onClick}
         component="img"
         src={preview}
         sx={{
@@ -46,6 +47,7 @@ export default function FileThumbnail({
       />
     ) : (
       <Box
+        onClick={onClick}
         component="img"
         src={URL.createObjectURL(file as Blob)}
         sx={{
@@ -59,7 +61,7 @@ export default function FileThumbnail({
 
   if (tooltip) {
     return (
-      <Tooltip title={name}>
+      <Tooltip onClick={onClick} title={name}>
         <Stack
           flexShrink={0}
           component="span"

@@ -21,4 +21,5 @@ export interface ProductVariantDto {
   deletedName?: string;
   orderItems?: OrderItemDto[];
   product?: ProductDto;
+  fileImage?: File | null;
 }

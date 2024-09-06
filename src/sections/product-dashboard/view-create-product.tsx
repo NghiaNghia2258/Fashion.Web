@@ -14,12 +14,10 @@ import { useContext, useEffect, useState } from 'react';
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import SendIcon from '@mui/icons-material/Send';
-
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { InputFile } from 'src/components/file-thumbnail';
 
@@ -29,9 +27,12 @@ import { useRouter } from 'src/routes/hooks';
 import { DashboardContext } from 'src/layouts/dashboard';
 import ProductService from 'src/sevices/api/product-services';
 import { ProductDto } from 'src/sevices/DTOs/product-dto';
+
 import { SplashScreen } from 'src/components/loading-screen';
 import ProductCategoryService from 'src/sevices/api/product-category-services';
 import { ProductCategoryDto } from 'src/sevices/DTOs/product-category-dto';
+import { ProductVariantDto } from 'src/sevices/DTOs/product-variant-dto';
+import UploadService from 'src/sevices/api/upload-services';
 
 // ----------------------------------------------------------------------
 
@@ -43,7 +44,6 @@ export default function CreateProductView() {
   const [categories, setcategories] = useState<ProductCategoryDto[]>([]);
   const [newProduct, setnewProduct] = useState<ProductDto>({
     name: '',
-    mainImageUrl: '',
     categoryId: '',
     productVariants: [],
   });
@@ -56,7 +56,7 @@ export default function CreateProductView() {
   const [price, setprice] = useState<number>(0);
   const [inventory, setinventory] = useState<number>(0);
   const [images, setImages] = useState<File[]>([]);
-  const [details, setdetails] = useState<any[]>([]);
+  const [details, setdetails] = useState<ProductVariantDto[]>([]);
 
   const [isOpenDialogCreate, setisOpenDialogCreate] = useState(false);
   const [isOpenDialogCancel, setisOpenDialogCancel] = useState(false);
@@ -67,10 +67,24 @@ export default function CreateProductView() {
   };
   const handleCreateProduct = async () => {
     setloading(true);
-    setisOpenDialogCreate(false);
+    const uploadServices = new UploadService();
+    newProduct.productVariants = await Promise.all(
+      details.map(async (detail) => {
+        const urlImaage = await uploadServices.UploadImage(detail.fileImage);
+        return { ...detail, imageUrl: urlImaage, fileImage: undefined };
+      })
+    );
 
+    newProduct.productImages = await Promise.all(
+      images.map(async (img) => {
+        const urlImaage = await uploadServices.UploadImage(img);
+        return {
+          imageUrl: urlImaage,
+        };
+      })
+    );
+    newProduct.mainImageUrl = newProduct.productImages[0].imageUrl;
     const productServices = new ProductService();
-    newProduct.productVariants = details;
     const res = await productServices.Create(newProduct);
     setloading(false);
     if (res.isSucceeded) {
@@ -89,9 +103,10 @@ export default function CreateProductView() {
         title: 'Thất bại',
       });
     }
+    setisOpenDialogCreate(false);
   };
   const handleAgreeCreate = async () => {
-    if (isErrInputName || newProduct.name?.length == 0) {
+    if (isErrInputName || newProduct.name?.length === 0) {
       toast?.ShowToast({
         severity: 'error',
         description: 'Tên sản phẩm không hợp lệ',
@@ -116,34 +131,15 @@ export default function CreateProductView() {
     setisOpenDialogCancel(false);
     router.replace('/dashboard/product/products');
   };
-  const columns: GridColDef[] = [
-    {
-      field: 'size',
-      headerName: 'Size',
-    },
-    {
-      field: 'color',
-      headerName: 'Color',
-    },
-    {
-      field: 'price',
-      headerName: 'Giá bán',
-      editable: true,
-    },
-    {
-      field: 'inventory',
-      headerName: 'Tồn kho',
-      editable: true,
-    },
-  ];
 
   useEffect(() => {
-    let newDetails = [];
+    const newDetails = [];
     let id = 1;
     if (colors.length == 0) {
       for (let j = 0; j < sizes.length; j++) {
+        id += 1;
         newDetails.push({
-          id: id++,
+          id: id.toLocaleString(),
           size: sizes[j],
           color: '',
           price: 0,
@@ -152,8 +148,10 @@ export default function CreateProductView() {
       }
     } else if (sizes.length == 0) {
       for (let j = 0; j < colors.length; j++) {
+        id += 1;
+
         newDetails.push({
-          id: id++,
+          id: id.toLocaleString(),
           size: '',
           color: colors[j],
           price: 0,
@@ -163,8 +161,9 @@ export default function CreateProductView() {
     } else {
       for (let i = 0; i < sizes.length; i++) {
         for (let j = 0; j < colors.length; j++) {
+          id += 1;
           newDetails.push({
-            id: id++,
+            id: id.toLocaleString(),
             size: sizes[i],
             color: colors[j],
             price: 0,
@@ -202,30 +201,6 @@ export default function CreateProductView() {
         }}
       >
         <Typography variant="h4">Thêm sản phẩm </Typography>
-        <Box
-          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
-        >
-          <Button
-            sx={{ height: '40px' }}
-            onClick={() => {}}
-            variant="contained"
-            color="success"
-            startIcon={<FileUploadIcon />}
-            size="small"
-          >
-            Import Excel
-          </Button>
-          <Button
-            sx={{ height: '40px' }}
-            onClick={() => {}}
-            variant="contained"
-            color="success"
-            startIcon={<FileDownloadIcon />}
-            size="small"
-          >
-            Export Excel
-          </Button>
-        </Box>
       </Box>
 
       <Box
@@ -518,25 +493,277 @@ export default function CreateProductView() {
                 sx={{
                   marginTop: 4,
                   padding: '10px',
+                  width: '70%',
+                  border: '1px solid #919eabcc',
+                  borderRadius: '10px',
                 }}
               >
-                <DataGrid
-                  onCellEditStart={(details) => {
-                    console.log({ details });
-                  }}
-                  rows={details}
-                  columns={columns}
-                  initialState={{
-                    pagination: {
-                      paginationModel: {
-                        pageSize: 10,
+                <Box
+                  className="head"
+                  sx={{ display: 'flex', backgroundColor: '#e4e8edf0', padding: '15px 30px' }}
+                >
+                  <Box flex={2}>Ảnh</Box>
+                  <Box flex={2}>Size</Box>
+                  <Box flex={2}>Màu</Box>
+                  <Box flex={3}>Giá bán</Box>
+                  <Box flex={2}>Tồn kho</Box>
+                  <Box flex={1}></Box>
+                </Box>
+                <Box className="list-detail">
+                  {details.map((detail, index) => {
+                    return (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          padding: '10px 30px',
+                          borderBottom: '1px solid #919eabcc',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Box flex={2}>
+                          {detail.fileImage ? (
+                            <InputFile
+                              onClick={() => {
+                                setdetails(
+                                  details.map((obj) => {
+                                    if (obj.id === detail.id) {
+                                      return {
+                                        ...detail,
+                                        fileImage: null,
+                                      };
+                                    } else {
+                                      return obj;
+                                    }
+                                  })
+                                );
+                              }}
+                              file={detail.fileImage}
+                              imageView={true}
+                              sx={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
+                                cursor: 'pointer',
+                                border: '1px solid #919eabcc',
+                              }}
+                            />
+                          ) : (
+                            <Box
+                              sx={{
+                                position: 'relative',
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
+                                border: '1px solid #919eabcc',
+                              }}
+                            >
+                              <TextField
+                                type="file"
+                                sx={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: '100%',
+                                  height: '100%',
+                                  zIndex: 2,
+                                  '& input': {
+                                    width: '40px',
+                                    height: '40px',
+                                    padding: 0,
+                                    opacity: 0,
+                                    cursor: 'pointer',
+                                  },
+                                }}
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                  if (event.target.files !== null) {
+                                    setdetails(
+                                      details.map((obj) => {
+                                        if (obj.id === detail.id) {
+                                          return {
+                                            ...detail,
+                                            fileImage: (event.target.files ?? [])[0],
+                                          };
+                                        } else {
+                                          return obj;
+                                        }
+                                      })
+                                    );
+                                  }
+                                }}
+                              />
+                              <DriveFolderUploadIcon
+                                sx={{
+                                  position: 'absolute',
+                                  top: '29%',
+                                  left: '29%',
+                                  fontSize: '17px',
+                                  zIndex: 1,
+                                }}
+                              />
+                            </Box>
+                          )}
+                        </Box>
+                        <Box flex={2}>
+                          <TextField
+                            sx={{ width: '80%' }}
+                            type="text"
+                            variant="standard"
+                            size="small"
+                            value={detail.size}
+                            onChange={(event: any) => {
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      size: event.target.value,
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            }}
+                          />
+                        </Box>
+                        <Box flex={2}>
+                          <TextField
+                            sx={{ width: '80%' }}
+                            type="text"
+                            variant="standard"
+                            size="small"
+                            value={detail.color}
+                            onChange={(event: any) => {
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      color: event.target.value,
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            }}
+                          />
+                        </Box>
+                        <Box flex={3}>
+                          <TextField
+                            sx={{ width: '80%' }}
+                            type="number"
+                            variant="standard"
+                            size="small"
+                            value={detail.price}
+                            onChange={(event: any) => {
+                              if (parseInt(event.target.value, 0) > 0) {
+                                setdetails(
+                                  details.map((obj) => {
+                                    if (obj.id === detail.id) {
+                                      return {
+                                        ...detail,
+                                        price: parseInt(event.target.value, 0),
+                                      };
+                                    } else {
+                                      return obj;
+                                    }
+                                  })
+                                );
+                              } else {
+                                event.target.value = undefined;
+                                setdetails(
+                                  details.map((obj) => {
+                                    if (obj.id === detail.id) {
+                                      return {
+                                        ...detail,
+                                        price: 0,
+                                      };
+                                    } else {
+                                      return obj;
+                                    }
+                                  })
+                                );
+                              }
+                            }}
+                          />
+                        </Box>
+                        <Box flex={2}>
+                          <TextField
+                            sx={{ width: '80%' }}
+                            type="number"
+                            variant="standard"
+                            size="small"
+                            value={detail.inventory}
+                            onChange={(event: any) => {
+                              if (parseInt(event.target.value, 0) > 0) {
+                                setdetails(
+                                  details.map((obj) => {
+                                    if (obj.id === detail.id) {
+                                      return {
+                                        ...detail,
+                                        inventory: parseInt(event.target.value, 0),
+                                      };
+                                    } else {
+                                      return obj;
+                                    }
+                                  })
+                                );
+                              } else {
+                                event.target.value = undefined;
+                                setdetails(
+                                  details.map((obj) => {
+                                    if (obj.id === detail.id) {
+                                      return {
+                                        ...detail,
+                                        inventory: 0,
+                                      };
+                                    } else {
+                                      return obj;
+                                    }
+                                  })
+                                );
+                              }
+                            }}
+                          />
+                        </Box>
+                        <Box flex={1}>
+                          <DeleteIcon
+                            sx={{ cursor: 'pointer' }}
+                            onClick={() => {
+                              setdetails(details.filter((obj) => obj.id !== detail.id));
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                  <Box
+                    onClick={() => {
+                      const newDetail = {
+                        id: (details.length + 1).toLocaleString(),
+                        size: '',
+                        color: '',
+                        price: 0,
+                        inventory: 0,
+                        fileImage: null,
+                      };
+                      setdetails([...details, newDetail]);
+                    }}
+                    sx={{
+                      marginTop: '5px',
+                      fontSize: '28px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      backgroundColor: '#e4e8edf0',
+                      '&:hover': {
+                        opacity: 0.8,
                       },
-                    },
-                  }}
-                  pageSizeOptions={[5, 10, 15]}
-                  checkboxSelection
-                  disableRowSelectionOnClick
-                />
+                    }}
+                  >
+                    +
+                  </Box>
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -560,11 +787,14 @@ export default function CreateProductView() {
             Hình ảnh sản phẩm <span style={{ color: 'red' }}>*</span>
           </Typography>
           <Box sx={{ padding: '10px', display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {images.map((image) => {
+            {images.map((image, index) => {
               return (
                 <InputFile
+                  onClick={() => {
+                    setImages(images.filter((_, i) => i !== index));
+                  }}
                   file={image}
-                  imageView={true}
+                  imageView
                   sx={{
                     width: '100px',
                     height: '100px',

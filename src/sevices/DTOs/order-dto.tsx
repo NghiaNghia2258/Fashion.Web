@@ -5,6 +5,7 @@ import { VoucherDto } from './voucher-dto';
 
 export interface OrderDto {
   id?: string; // Tương ứng với EntityBase<Guid>
+  code?: string; // Tương ứng với EntityBase<Guid>
   note?: string; // Thuộc tính Note, tùy chọn
   customerNote?: string; // Thuộc tính CustomerNote, tùy chọn
   paymentStatus?: string; // Thuộc tính PaymentStatus, không thể null
@@ -12,8 +13,12 @@ export interface OrderDto {
   discountPercent?: number; // Thuộc tính DiscountPercent, tùy chọn
   discountValue?: number; // Thuộc tính DiscountValue, tùy chọn
   customerId?: string; // Thuộc tính CustomerId, tùy chọn
+  customerName?: string; // Thuộc tính CustomerId, tùy chọn
   voucherId?: string; // Thuộc tính VoucherId, tùy chọn
   recipientsInformationId?: string; // Thuộc tính RecipientsInformationId, tùy chọn
+  totalPrice?: number; // Thuộc tính RecipientsInformationId, tùy chọn
+  totalDiscount?: number; // Thuộc tính RecipientsInformationId, tùy chọn
+  status?: number;
   createdAt?: Date; // Thuộc tính CreatedAt, tùy chọn
   createdBy?: string; // Thuộc tính CreatedBy, tùy chọn
   createdName?: string; // Thuộc tính CreatedName, tùy chọn

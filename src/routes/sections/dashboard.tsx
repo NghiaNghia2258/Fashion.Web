@@ -18,6 +18,7 @@ const DashboardPage = lazy(() => import('src/pages/dashboard/dashboard'));
 const ProductsPage = lazy(() => import('src/pages/dashboard/products'));
 const ProductDetailPage = lazy(() => import('src/pages/dashboard/productDetail'));
 const CustomersPage = lazy(() => import('src/pages/dashboard/customers'));
+const OrdersPage = lazy(() => import('src/pages/dashboard/orders'));
 
 // ----------------------------------------------------------------------
 
@@ -63,6 +64,13 @@ export const dashboardRoutes = [
           { path: 'customers', element: <CustomersPage /> },
           { path: 'create-customer', element: <PageSix /> },
           { path: 'customer-group', element: <PageFive /> },
+        ],
+      },
+      {
+        path: 'order',
+        children: [
+          { element: <PageFour />, index: true },
+          { path: 'orders', element: <OrdersPage /> },
         ],
       },
     ],

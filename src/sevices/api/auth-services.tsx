@@ -7,7 +7,6 @@ export interface ResponseLogin {
 }
 
 export default class AuthenService {
-  constructor() {}
   async Login(user: UserLoginDto): Promise<ApiResult<ResponseLogin>> {
     // TODO: Implement login logic here
     return {
