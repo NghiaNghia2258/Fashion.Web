@@ -4,20 +4,20 @@ import { useBoolean } from 'src/hooks/use-boolean';
 import { useResponsive } from 'src/hooks/use-responsive';
 
 import { useSettingsContext } from 'src/components/settings';
-import Alert, { AlertProps } from '@mui/material/Alert';
+import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
 import AlertTitle from '@mui/material/AlertTitle';
 import LinearProgress from '@mui/material/LinearProgress';
 
-import Main from './main';
+import { Theme } from '@mui/material/styles';
+import { SxProps } from '@mui/system';
+import { useState, createContext } from 'react';
 import Header from './header';
 import NavMini from './nav-mini';
 import NavVertical from './nav-vertical';
 import NavHorizontal from './nav-horizontal';
-import { createContext, useEffect, useState } from 'react';
 
-import { SxProps } from '@mui/system';
-import { Theme } from '@mui/material/styles';
+import Main from './main';
 
 // ----------------------------------------------------------------------
 
@@ -63,17 +63,15 @@ export default function DashboardLayout({ children }: Props) {
     title: '',
     sx: {},
   });
-  const [progress, setProgress] = useState<number>(0);
 
   const ShowToast = ({ severity, description, autoHideDuration, title, sx }: ToastOptions) => {
     settoast({
       open: true,
-      severity: severity,
-      description: description,
-      title: title,
-      sx: sx,
+      severity,
+      description,
+      title,
+      sx,
     });
-    setProgress(autoHideDuration ?? 999999);
     setTimeout(() => {
       settoast({ open: false, severity: '', description: '', title: '', sx: {} });
     }, autoHideDuration ?? 999999);

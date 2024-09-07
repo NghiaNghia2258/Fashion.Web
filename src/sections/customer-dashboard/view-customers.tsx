@@ -84,18 +84,16 @@ export default function CustomersView() {
       field: 'ida',
       headerName: 'Thao tác',
       width: 200,
-      renderCell: () => {
-        return (
-          <Box>
-            <EditIcon />
-            <DeleteIcon
-              onClick={() => {
-                setOpen(true);
-              }}
-            />
-          </Box>
-        );
-      },
+      renderCell: () => (
+        <Box>
+          <EditIcon />
+          <DeleteIcon
+            onClick={() => {
+              setOpen(true);
+            }}
+          />
+        </Box>
+      ),
     },
   ];
 
@@ -146,14 +144,7 @@ export default function CustomersView() {
           }}
         />
 
-        <Button
-          onClick={() => {
-            //console.log(optionPagination);
-          }}
-          variant="contained"
-          color="success"
-          sx={{}}
-        >
+        <Button onClick={() => {}} variant="contained" color="success" sx={{}}>
           Lọc
         </Button>
       </Box>

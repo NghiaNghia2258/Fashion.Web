@@ -6,6 +6,7 @@ function delay(ms: number): Promise<void> {
 }
 export default class ProductCategoryService {
   async GetAll(): Promise<ApiResult<ProductCategoryDto[]>> {
+    await delay(100);
     const response = {
       isSucceeded: true,
       message: '',
@@ -31,13 +32,12 @@ export default class ProductCategoryService {
         data: response.data,
         totalRecordsCount: response.totalRecordsCount,
       };
-    } else {
-      return {
-        isSucceeded: false,
-        message: response.message,
-        data: [],
-        totalRecordsCount: 0,
-      };
     }
+    return {
+      isSucceeded: false,
+      message: response.message,
+      data: [],
+      totalRecordsCount: 0,
+    };
   }
 }

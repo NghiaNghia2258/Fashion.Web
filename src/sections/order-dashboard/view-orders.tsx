@@ -4,18 +4,21 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { useSettingsContext } from 'src/components/settings';
-import { useEffect, useState } from 'react';
-import { Button, TablePagination, TextField } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Button, TextField, TablePagination } from '@mui/material';
 
 import { OrderDto } from 'src/sevices/DTOs/order-dto';
 import OrderService from 'src/sevices/api/order-services';
 import { OptionFilterOrder } from 'src/sevices/paramas/option-filter-order';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
 
 export default function OrdersView() {
   const settings = useSettingsContext();
+  const router = useRouter();
+
   const [optionFilter, setoptionFilter] = useState<OptionFilterOrder>(new OptionFilterOrder());
   const [loading, setLoading] = useState<boolean>(false);
   const [totalRecordsCount, setTotalRecordsCount] = useState<number>(0);
@@ -257,43 +260,48 @@ export default function OrdersView() {
           {loading ? (
             <CircularProgress sx={{ margin: '10% 45%' }} />
           ) : (
-            orders.map((order, index) => {
-              return (
+            orders.map((order, index) => (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '15px 10px',
+                  borderBottom: '1px solid #919eabcc',
+                }}
+              >
+                <Box paddingLeft={'5px'} flex={2}>
+                  {index + 1}
+                </Box>
                 <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '15px 10px',
-                    borderBottom: '1px solid #919eabcc',
+                  flex={3}
+                  onClick={() => {
+                    router.replace(`/dashboard/order/order-detail/${order.id}`);
                   }}
                 >
-                  <Box paddingLeft={'5px'} flex={2}>
-                    {index + 1}
-                  </Box>
-                  <Box flex={3}>{order.code}</Box>
-                  <Box flex={7}>{order.customerName}</Box>
-                  <Box flex={5}>{order.createdAt?.toLocaleDateString()}</Box>
-                  <Box flex={6}>{order.createdName}</Box>
-                  <Box flex={5}>
-                    {(order.totalPrice ?? 0).toLocaleString('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND',
-                    })}
-                  </Box>
-                  <Box flex={3}>{((order.tax ?? 0) * 100).toFixed(2)}%</Box>
-                  <Box flex={5}>
-                    {(
-                      (order.discountValue ?? 0) +
-                      (order.discountPercent ?? 0) * (order.totalPrice ?? 0)
-                    ).toLocaleString('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND',
-                    })}
-                  </Box>
-                  <Box flex={5}>{renderStatus(order.status)}</Box>
+                  {order.code}
                 </Box>
-              );
-            })
+                <Box flex={7}>{order.customerName}</Box>
+                <Box flex={5}>{order.createdAt?.toLocaleDateString()}</Box>
+                <Box flex={6}>{order.createdName}</Box>
+                <Box flex={5}>
+                  {(order.totalPrice ?? 0).toLocaleString('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                  })}
+                </Box>
+                <Box flex={3}>{((order.tax ?? 0) * 100).toFixed(2)}%</Box>
+                <Box flex={5}>
+                  {(
+                    (order.discountValue ?? 0) +
+                    (order.discountPercent ?? 0) * (order.totalPrice ?? 0)
+                  ).toLocaleString('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                  })}
+                </Box>
+                <Box flex={5}>{renderStatus(order.status)}</Box>
+              </Box>
+            ))
           )}
         </Box>
         <TablePagination

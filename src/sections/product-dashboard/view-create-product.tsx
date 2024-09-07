@@ -10,7 +10,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { useContext, useEffect, useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
@@ -135,8 +135,8 @@ export default function CreateProductView() {
   useEffect(() => {
     const newDetails = [];
     let id = 1;
-    if (colors.length == 0) {
-      for (let j = 0; j < sizes.length; j++) {
+    if (colors.length === 0) {
+      for (let j = 0; j < sizes.length; j += 1) {
         id += 1;
         newDetails.push({
           id: id.toLocaleString(),
@@ -146,8 +146,8 @@ export default function CreateProductView() {
           inventory: 0,
         });
       }
-    } else if (sizes.length == 0) {
-      for (let j = 0; j < colors.length; j++) {
+    } else if (sizes.length === 0) {
+      for (let j = 0; j < colors.length; j += 1) {
         id += 1;
 
         newDetails.push({
@@ -159,8 +159,8 @@ export default function CreateProductView() {
         });
       }
     } else {
-      for (let i = 0; i < sizes.length; i++) {
-        for (let j = 0; j < colors.length; j++) {
+      for (let i = 0; i < sizes.length; i += 1) {
+        for (let j = 0; j < colors.length; j += 1) {
           id += 1;
           newDetails.push({
             id: id.toLocaleString(),
@@ -434,8 +434,8 @@ export default function CreateProductView() {
                     label="Giá bán"
                     type="number"
                     onChange={(event: any) => {
-                      if (parseInt(event.target.value, 0) > 0) {
-                        setprice(parseInt(event.target.value, 0));
+                      if (parseInt(event.target.value, 10) > 0) {
+                        setprice(parseInt(event.target.value, 10));
                       } else {
                         event.target.value = undefined;
                         setprice(0);
@@ -458,8 +458,8 @@ export default function CreateProductView() {
                     label="Tồn kho"
                     type="number"
                     onChange={(event: any) => {
-                      if (parseInt(event.target.value, 0) > 0) {
-                        setinventory(parseInt(event.target.value, 0));
+                      if (parseInt(event.target.value, 10) > 0) {
+                        setinventory(parseInt(event.target.value, 10));
                       } else {
                         event.target.value = undefined;
                         setinventory(0);
@@ -510,234 +510,233 @@ export default function CreateProductView() {
                   <Box flex={1}></Box>
                 </Box>
                 <Box className="list-detail">
-                  {details.map((detail, index) => {
-                    return (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          padding: '10px 30px',
-                          borderBottom: '1px solid #919eabcc',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Box flex={2}>
-                          {detail.fileImage ? (
-                            <InputFile
-                              onClick={() => {
-                                setdetails(
-                                  details.map((obj) => {
-                                    if (obj.id === detail.id) {
-                                      return {
-                                        ...detail,
-                                        fileImage: null,
-                                      };
-                                    } else {
-                                      return obj;
-                                    }
-                                  })
-                                );
-                              }}
-                              file={detail.fileImage}
-                              imageView={true}
+                  {details.map((detail, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: 'flex',
+                        padding: '10px 30px',
+                        borderBottom: '1px solid #919eabcc',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Box flex={2}>
+                        {detail.fileImage ? (
+                          <InputFile
+                            onClick={() => {
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      fileImage: null,
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            }}
+                            file={detail.fileImage}
+                            imageView
+                            sx={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '10px',
+                              cursor: 'pointer',
+                              border: '1px solid #919eabcc',
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              position: 'relative',
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '10px',
+                              border: '1px solid #919eabcc',
+                            }}
+                          >
+                            <TextField
+                              type="file"
                               sx={{
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '10px',
-                                cursor: 'pointer',
-                                border: '1px solid #919eabcc',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                zIndex: 2,
+                                '& input': {
+                                  width: '40px',
+                                  height: '40px',
+                                  padding: 0,
+                                  opacity: 0,
+                                  cursor: 'pointer',
+                                },
+                              }}
+                              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                if (event.target.files !== null) {
+                                  setdetails(
+                                    details.map((obj) => {
+                                      if (obj.id === detail.id) {
+                                        return {
+                                          ...detail,
+                                          fileImage: (event.target.files ?? [])[0],
+                                        };
+                                      } else {
+                                        return obj;
+                                      }
+                                    })
+                                  );
+                                }
                               }}
                             />
-                          ) : (
-                            <Box
+                            <DriveFolderUploadIcon
                               sx={{
-                                position: 'relative',
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '10px',
-                                border: '1px solid #919eabcc',
+                                position: 'absolute',
+                                top: '29%',
+                                left: '29%',
+                                fontSize: '17px',
+                                zIndex: 1,
                               }}
-                            >
-                              <TextField
-                                type="file"
-                                sx={{
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  width: '100%',
-                                  height: '100%',
-                                  zIndex: 2,
-                                  '& input': {
-                                    width: '40px',
-                                    height: '40px',
-                                    padding: 0,
-                                    opacity: 0,
-                                    cursor: 'pointer',
-                                  },
-                                }}
-                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                  if (event.target.files !== null) {
-                                    setdetails(
-                                      details.map((obj) => {
-                                        if (obj.id === detail.id) {
-                                          return {
-                                            ...detail,
-                                            fileImage: (event.target.files ?? [])[0],
-                                          };
-                                        } else {
-                                          return obj;
-                                        }
-                                      })
-                                    );
-                                  }
-                                }}
-                              />
-                              <DriveFolderUploadIcon
-                                sx={{
-                                  position: 'absolute',
-                                  top: '29%',
-                                  left: '29%',
-                                  fontSize: '17px',
-                                  zIndex: 1,
-                                }}
-                              />
-                            </Box>
-                          )}
-                        </Box>
-                        <Box flex={2}>
-                          <TextField
-                            sx={{ width: '80%' }}
-                            type="text"
-                            variant="standard"
-                            size="small"
-                            value={detail.size}
-                            onChange={(event: any) => {
-                              setdetails(
-                                details.map((obj) => {
-                                  if (obj.id === detail.id) {
-                                    return {
-                                      ...detail,
-                                      size: event.target.value,
-                                    };
-                                  } else {
-                                    return obj;
-                                  }
-                                })
-                              );
-                            }}
-                          />
-                        </Box>
-                        <Box flex={2}>
-                          <TextField
-                            sx={{ width: '80%' }}
-                            type="text"
-                            variant="standard"
-                            size="small"
-                            value={detail.color}
-                            onChange={(event: any) => {
-                              setdetails(
-                                details.map((obj) => {
-                                  if (obj.id === detail.id) {
-                                    return {
-                                      ...detail,
-                                      color: event.target.value,
-                                    };
-                                  } else {
-                                    return obj;
-                                  }
-                                })
-                              );
-                            }}
-                          />
-                        </Box>
-                        <Box flex={3}>
-                          <TextField
-                            sx={{ width: '80%' }}
-                            type="number"
-                            variant="standard"
-                            size="small"
-                            value={detail.price}
-                            onChange={(event: any) => {
-                              if (parseInt(event.target.value, 0) > 0) {
-                                setdetails(
-                                  details.map((obj) => {
-                                    if (obj.id === detail.id) {
-                                      return {
-                                        ...detail,
-                                        price: parseInt(event.target.value, 0),
-                                      };
-                                    } else {
-                                      return obj;
-                                    }
-                                  })
-                                );
-                              } else {
-                                event.target.value = undefined;
-                                setdetails(
-                                  details.map((obj) => {
-                                    if (obj.id === detail.id) {
-                                      return {
-                                        ...detail,
-                                        price: 0,
-                                      };
-                                    } else {
-                                      return obj;
-                                    }
-                                  })
-                                );
-                              }
-                            }}
-                          />
-                        </Box>
-                        <Box flex={2}>
-                          <TextField
-                            sx={{ width: '80%' }}
-                            type="number"
-                            variant="standard"
-                            size="small"
-                            value={detail.inventory}
-                            onChange={(event: any) => {
-                              if (parseInt(event.target.value, 0) > 0) {
-                                setdetails(
-                                  details.map((obj) => {
-                                    if (obj.id === detail.id) {
-                                      return {
-                                        ...detail,
-                                        inventory: parseInt(event.target.value, 0),
-                                      };
-                                    } else {
-                                      return obj;
-                                    }
-                                  })
-                                );
-                              } else {
-                                event.target.value = undefined;
-                                setdetails(
-                                  details.map((obj) => {
-                                    if (obj.id === detail.id) {
-                                      return {
-                                        ...detail,
-                                        inventory: 0,
-                                      };
-                                    } else {
-                                      return obj;
-                                    }
-                                  })
-                                );
-                              }
-                            }}
-                          />
-                        </Box>
-                        <Box flex={1}>
-                          <DeleteIcon
-                            sx={{ cursor: 'pointer' }}
-                            onClick={() => {
-                              setdetails(details.filter((obj) => obj.id !== detail.id));
-                            }}
-                          />
-                        </Box>
+                            />
+                          </Box>
+                        )}
                       </Box>
-                    );
-                  })}
+                      <Box flex={2}>
+                        <TextField
+                          sx={{ width: '80%' }}
+                          type="text"
+                          variant="standard"
+                          size="small"
+                          value={detail.size}
+                          onChange={(event: any) => {
+                            setdetails(
+                              details.map((obj) => {
+                                if (obj.id === detail.id) {
+                                  return {
+                                    ...detail,
+                                    size: event.target.value,
+                                  };
+                                } else {
+                                  return obj;
+                                }
+                              })
+                            );
+                          }}
+                        />
+                      </Box>
+                      <Box flex={2}>
+                        <TextField
+                          sx={{ width: '80%' }}
+                          type="text"
+                          variant="standard"
+                          size="small"
+                          value={detail.color}
+                          onChange={(event: any) => {
+                            setdetails(
+                              details.map((obj) => {
+                                if (obj.id === detail.id) {
+                                  return {
+                                    ...detail,
+                                    color: event.target.value,
+                                  };
+                                } else {
+                                  return obj;
+                                }
+                              })
+                            );
+                          }}
+                        />
+                      </Box>
+                      <Box flex={3}>
+                        <TextField
+                          sx={{ width: '80%' }}
+                          type="number"
+                          variant="standard"
+                          size="small"
+                          value={detail.price}
+                          onChange={(event: any) => {
+                            if (parseInt(event.target.value, 10) > 0) {
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      price: parseInt(event.target.value, 10),
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            } else {
+                              event.target.value = undefined;
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      price: 0,
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            }
+                          }}
+                        />
+                      </Box>
+                      <Box flex={2}>
+                        <TextField
+                          sx={{ width: '80%' }}
+                          type="number"
+                          variant="standard"
+                          size="small"
+                          value={detail.inventory}
+                          onChange={(event: any) => {
+                            if (parseInt(event.target.value, 10) > 0) {
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      inventory: parseInt(event.target.value, 10),
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            } else {
+                              event.target.value = undefined;
+                              setdetails(
+                                details.map((obj) => {
+                                  if (obj.id === detail.id) {
+                                    return {
+                                      ...detail,
+                                      inventory: 0,
+                                    };
+                                  } else {
+                                    return obj;
+                                  }
+                                })
+                              );
+                            }
+                          }}
+                        />
+                      </Box>
+                      <Box flex={1}>
+                        <DeleteIcon
+                          sx={{ cursor: 'pointer' }}
+                          onClick={() => {
+                            setdetails(details.filter((obj) => obj.id !== detail.id));
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  ))}
                   <Box
                     onClick={() => {
                       const newDetail = {
@@ -787,24 +786,22 @@ export default function CreateProductView() {
             Hình ảnh sản phẩm <span style={{ color: 'red' }}>*</span>
           </Typography>
           <Box sx={{ padding: '10px', display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            {images.map((image, index) => {
-              return (
-                <InputFile
-                  onClick={() => {
-                    setImages(images.filter((_, i) => i !== index));
-                  }}
-                  file={image}
-                  imageView
-                  sx={{
-                    width: '100px',
-                    height: '100px',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    border: '1px solid #919eabcc',
-                  }}
-                />
-              );
-            })}
+            {images.map((image, index) => (
+              <InputFile
+                onClick={() => {
+                  setImages(images.filter((_, i) => i !== index));
+                }}
+                file={image}
+                imageView
+                sx={{
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  border: '1px solid #919eabcc',
+                }}
+              />
+            ))}
 
             <Box
               sx={{

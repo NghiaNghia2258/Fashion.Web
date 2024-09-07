@@ -3,8 +3,7 @@ export default class UploadService {
     // Implement image upload logic here
     if (fileImage) {
       return 'image_url';
-    } else {
-      return '';
     }
+    return '';
   }
 }

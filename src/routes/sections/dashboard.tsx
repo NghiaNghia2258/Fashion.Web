@@ -19,6 +19,7 @@ const ProductsPage = lazy(() => import('src/pages/dashboard/products'));
 const ProductDetailPage = lazy(() => import('src/pages/dashboard/productDetail'));
 const CustomersPage = lazy(() => import('src/pages/dashboard/customers'));
 const OrdersPage = lazy(() => import('src/pages/dashboard/orders'));
+const OrderDetailPage = lazy(() => import('src/pages/dashboard/orderDetail'));
 
 // ----------------------------------------------------------------------
 
@@ -71,6 +72,7 @@ export const dashboardRoutes = [
         children: [
           { element: <PageFour />, index: true },
           { path: 'orders', element: <OrdersPage /> },
+          { path: 'order-detail/:id', element: <OrderDetailPage /> },
         ],
       },
     ],

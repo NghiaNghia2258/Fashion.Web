@@ -8,7 +8,7 @@ function delay(ms: number): Promise<void> {
 
 export default class ProductService {
   async GetAll(options: OptionFilterProduct): Promise<ApiResult<ProductDto[]>> {
-    //const response = await axios.post('/products', { params: options });
+    // const response = await axios.post('/products', { params: options });
     await delay(2000);
     const response = {
       isSucceeded: true,
@@ -98,14 +98,13 @@ export default class ProductService {
         data: response.data,
         totalRecordsCount: response.totalRecordsCount,
       };
-    } else {
-      return {
-        isSucceeded: false,
-        data: [],
-        totalRecordsCount: 0,
-        message: response.message,
-      };
     }
+    return {
+      isSucceeded: false,
+      data: [],
+      totalRecordsCount: 0,
+      message: response.message,
+    };
   }
 
   async GetById(id: string): Promise<ApiResult<ProductDto>> {
@@ -136,7 +135,7 @@ export default class ProductService {
             size: 'L',
             color: 'Blue',
             price: 229999,
-            imageUrl: null,
+            imageUrl: undefined,
             inventory: 30,
           },
         ],
@@ -159,13 +158,12 @@ export default class ProductService {
         isSucceeded: true,
         data: response.data,
       };
-    } else {
-      return {
-        isSucceeded: false,
-        data: {},
-        message: response.message,
-      };
     }
+    return {
+      isSucceeded: false,
+      data: {},
+      message: response.message,
+    };
   }
   async Create(product: ProductDto): Promise<ApiResult<boolean>> {
     console.log(product);
@@ -178,12 +176,11 @@ export default class ProductService {
       return {
         isSucceeded: true,
       };
-    } else {
-      return {
-        isSucceeded: false,
-        message: response.message,
-      };
     }
+    return {
+      isSucceeded: false,
+      message: response.message,
+    };
   }
   async Update(product: ProductDto): Promise<ApiResult<boolean>> {
     console.log(product);
@@ -196,12 +193,11 @@ export default class ProductService {
       return {
         isSucceeded: true,
       };
-    } else {
-      return {
-        isSucceeded: false,
-        message: response.message,
-      };
     }
+    return {
+      isSucceeded: false,
+      message: response.message,
+    };
   }
   async Delete(id: string): Promise<ApiResult<boolean>> {
     await delay(500);
@@ -213,11 +209,10 @@ export default class ProductService {
       return {
         isSucceeded: true,
       };
-    } else {
-      return {
-        isSucceeded: false,
-        message: response.message,
-      };
     }
+    return {
+      isSucceeded: false,
+      message: response.message,
+    };
   }
 }

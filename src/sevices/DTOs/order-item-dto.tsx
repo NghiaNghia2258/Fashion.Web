@@ -2,14 +2,16 @@ import { OrderDto } from './order-dto';
 import { ProductVariantDto } from './product-variant-dto';
 
 export interface OrderItemDto {
-  id?: string; // Tương ứng với EntityBase<Guid>
-  orderId?: string; // Thuộc tính OrderId, tùy chọn
-  productVariantId?: string; // Thuộc tính ProductVariantId, tùy chọn
-  quantity?: number; // Thuộc tính Quantity, không thể null
-  unitPrice?: number; // Thuộc tính UnitPrice, không thể null
-  discountPercent?: number; // Thuộc tính DiscountPercent, tùy chọn
-  discountValue?: number; // Thuộc tính DiscountValue, tùy chọn
+  id?: string;
+  orderId?: string;
+  productVariantId?: string;
+  productVariantName?: string;
+  imageUrl?: string;
+  quantity?: number;
+  unitPrice?: number;
+  discountPercent?: number;
+  discountValue?: number;
 
-  order?: OrderDto; // Đối tượng Order, tùy chọn
-  productVariant?: ProductVariantDto; // Đối tượng ProductVariant, tùy chọn
+  order?: OrderDto;
+  productVariant?: ProductVariantDto;
 }

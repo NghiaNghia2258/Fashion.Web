@@ -4,7 +4,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { Theme, SxProps } from '@mui/material/styles';
 
 import DownloadButton from './download-button';
-import { fileData, fileThumb, fileFormat } from './utils';
+import { fileData, fileFormat } from './utils';
 
 // ----------------------------------------------------------------------
 

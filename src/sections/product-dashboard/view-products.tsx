@@ -19,7 +19,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 import { useSettingsContext } from 'src/components/settings';
-import { useContext, useEffect, useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'src/routes/hooks';
 import Button from '@mui/material/Button';
 
@@ -41,7 +41,6 @@ export default function ProductsView() {
 
   const [open, setOpen] = useState<boolean>(false);
   const [totalRecordsCount, settotalRecordsCount] = useState<number>(0);
-  const [messageErr, setmessageErr] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [idDelete, setidDelete] = useState<string>('');
 
@@ -104,8 +103,6 @@ export default function ProductsView() {
       if (res.isSucceeded) {
         setProducts(res.data ?? []);
         settotalRecordsCount(res.totalRecordsCount ?? 0);
-      } else {
-        setmessageErr(res.message ?? 'Error');
       }
     };
     setLoading(true);
@@ -190,7 +187,7 @@ export default function ProductsView() {
           onChange={(event: any) => {
             setoptionFilter({
               ...optionFilter,
-              priceMin: event.target.value ? parseInt(event.target.value) : null,
+              priceMin: event.target.value ? parseInt(event.target.value, 10) : null,
             });
           }}
         />
@@ -205,7 +202,7 @@ export default function ProductsView() {
           onChange={(event: any) => {
             setoptionFilter({
               ...optionFilter,
-              priceMax: event.target.value ? parseInt(event.target.value) : null,
+              priceMax: event.target.value ? parseInt(event.target.value, 10) : null,
             });
           }}
         />
@@ -221,7 +218,7 @@ export default function ProductsView() {
             onChange={(event: SelectChangeEvent) => {
               setoptionFilter({
                 ...optionFilter,
-                status: parseInt(event.target.value),
+                status: parseInt(event.target.value, 10),
               });
             }}
           >
@@ -329,162 +326,157 @@ export default function ProductsView() {
           <Box className="list-products" sx={{ marginTop: 2, textAlign: 'center' }}>
             {loading ? (
               <CircularProgress sx={{ margin: '0 45%' }} />
-            ) : products.length == 0 ? (
+            ) : products.length === 0 ? (
               'Không tìm thấy sản phẩm'
             ) : (
-              products.map((product, index) => {
-                return (
-                  <>
+              products.map((product, index) => (
+                <>
+                  <Box
+                    key={index}
+                    className="row"
+                    sx={{ backgroundColor: '#fff', borderBottom: '1px solid #b0aeae' }}
+                  >
                     <Box
-                      key={index}
-                      className="row"
-                      sx={{ backgroundColor: '#fff', borderBottom: '1px solid #b0aeae' }}
+                      className="cell"
+                      sx={{ width: 10, cursor: 'pointer' }}
+                      onClick={() => {
+                        product.isActive = !product.isActive;
+                        setProducts([...products]);
+                      }}
                     >
-                      <Box
-                        className="cell"
-                        sx={{ width: 10, cursor: 'pointer' }}
-                        onClick={() => {
-                          product.isActive = !product.isActive;
-                          setProducts([...products]);
-                        }}
-                      >
-                        {product.isActive ? <KeyboardArrowDownIcon /> : <ChevronRightIcon />}
-                      </Box>
+                      {product.isActive ? <KeyboardArrowDownIcon /> : <ChevronRightIcon />}
+                    </Box>
 
-                      <Box className="cell" sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}>
-                        <p>{index + 1}</p>
-                      </Box>
+                    <Box className="cell" sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}>
+                      <p>{index + 1}</p>
+                    </Box>
+                    <Box
+                      component="img"
+                      src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
+                      sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
+                      alt="Quảng cáo"
+                    />
+                    <Box className="cell" sx={{ flex: 6 }}>
+                      {product.name}
+                    </Box>
+                    <Box className="cell" sx={{ flex: 2 }}></Box>
+                    <Box className="cell" sx={{ flex: 2 }}></Box>
+                    <Box className="cell" sx={{ flex: 4 }}>
+                      {product.categoryName}
+                    </Box>
+                    <Box className="cell" sx={{ flex: 3 }}>
+                      {/* {product.price.toLocaleString('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                  })} */}
+                    </Box>
+                    <Box className="cell" sx={{ flex: 2 }}>
+                      {(product.productVariants ?? []).reduce(
+                        (accumulator, currentValue) => accumulator + (currentValue.inventory ?? 0),
+                        0
+                      )}
+                    </Box>
+                    <Box className="cell" sx={{ flex: 3 }}>
                       <Box
-                        component="img"
-                        src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
-                        sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
-                        alt="Quảng cáo"
-                      />
-                      <Box className="cell" sx={{ flex: 6 }}>
-                        {product.name}
-                      </Box>
-                      <Box className="cell" sx={{ flex: 2 }}></Box>
-                      <Box className="cell" sx={{ flex: 2 }}></Box>
-                      <Box className="cell" sx={{ flex: 4 }}>
-                        {product.categoryName}
-                      </Box>
-                      <Box className="cell" sx={{ flex: 3 }}>
-                        {/* {product.price.toLocaleString('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                      })} */}
-                      </Box>
-                      <Box className="cell" sx={{ flex: 2 }}>
-                        {(product.productVariants ?? []).reduce(
-                          (accumulator, currentValue) =>
-                            accumulator + (currentValue.inventory ?? 0),
-                          0
-                        )}
-                      </Box>
-                      <Box className="cell" sx={{ flex: 3 }}>
-                        <Box
-                          sx={{
-                            ...((product.productVariants ?? []).reduce(
-                              (accumulator, currentValue) =>
-                                accumulator + (currentValue.inventory ?? 0),
-                              0
-                            ) === 0
-                              ? { border: '3px solid #f44336', color: '#f44336' }
-                              : { border: '3px solid #4caf50', color: '#4caf50' }),
-                            fontSize: '13px',
-                            padding: '3px 7px',
-                            width: '100%',
-                            borderRadius: '5px',
-                          }}
-                        >
-                          {(product.productVariants ?? []).reduce(
+                        sx={{
+                          ...((product.productVariants ?? []).reduce(
                             (accumulator, currentValue) =>
                               accumulator + (currentValue.inventory ?? 0),
                             0
                           ) === 0
-                            ? 'Hết hàng'
-                            : 'Còn hàng'}
-                        </Box>
-                      </Box>
-                      <Box className="cell" sx={{ flex: 3 }}>
-                        <Box
-                          className="button-action"
-                          onClick={() => {
-                            router.replace(`/dashboard/product/product-detail/${product.id}`);
-                          }}
-                        >
-                          <EditIcon />
-                        </Box>
-                        <Box className="button-action">
-                          <DeleteIcon
-                            onClick={() => {
-                              setidDelete(product.id ?? '');
-                              setOpen(true);
-                            }}
-                          />
-                        </Box>
+                            ? { border: '3px solid #f44336', color: '#f44336' }
+                            : { border: '3px solid #4caf50', color: '#4caf50' }),
+                          fontSize: '13px',
+                          padding: '3px 7px',
+                          width: '100%',
+                          borderRadius: '5px',
+                        }}
+                      >
+                        {(product.productVariants ?? []).reduce(
+                          (accumulator, currentValue) =>
+                            accumulator + (currentValue.inventory ?? 0),
+                          0
+                        ) === 0
+                          ? 'Hết hàng'
+                          : 'Còn hàng'}
                       </Box>
                     </Box>
-                    {product.isActive
-                      ? (product.productVariants ?? []).map((v) => {
-                          return (
-                            <Box key={index * 2 + 3} className="row" sx={{ marginTop: '5px' }}>
-                              <Box className="cell"></Box>
+                    <Box className="cell" sx={{ flex: 3 }}>
+                      <Box
+                        className="button-action"
+                        onClick={() => {
+                          router.replace(`/dashboard/product/product-detail/${product.id}`);
+                        }}
+                      >
+                        <EditIcon />
+                      </Box>
+                      <Box className="button-action">
+                        <DeleteIcon
+                          onClick={() => {
+                            setidDelete(product.id ?? '');
+                            setOpen(true);
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  </Box>
+                  {product.isActive
+                    ? (product.productVariants ?? []).map((v) => (
+                        <Box key={index * 2 + 3} className="row" sx={{ marginTop: '5px' }}>
+                          <Box className="cell"></Box>
 
-                              <Box
-                                className="cell"
-                                sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}
-                              ></Box>
-                              <Box
-                                component="img"
-                                src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
-                                sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
-                                alt="Quảng cáo"
-                              />
-                              <Box className="cell" sx={{ flex: 6 }}></Box>
-                              <Box className="cell" sx={{ flex: 2 }}>
-                                {v.size}
-                              </Box>
-                              <Box className="cell" sx={{ flex: 2 }}>
-                                {v.color}
-                              </Box>
-                              <Box className="cell" sx={{ flex: 4 }} />
-                              <Box className="cell" sx={{ flex: 3 }}>
-                                {v.price
-                                  ? v.price.toLocaleString('vi-VN', {
-                                      style: 'currency',
-                                      currency: 'VND',
-                                    })
-                                  : 0}
-                              </Box>
-                              <Box className="cell" sx={{ flex: 2 }}>
-                                {v.inventory}
-                              </Box>
-                              <Box className="cell" sx={{ flex: 3 }}>
-                                <Box
-                                  sx={{
-                                    ...(v.inventory === 0
-                                      ? { border: '3px solid #f44336', color: '#f44336' }
-                                      : { border: '3px solid #4caf50', color: '#4caf50' }),
-                                    fontSize: '13px',
-                                    padding: '3px 7px',
-                                    width: '100%',
-                                    borderRadius: '5px',
-                                  }}
-                                >
-                                  {v.inventory === 0 ? 'Hết hàng' : 'Còn hàng'}
-                                </Box>
-                              </Box>
-                              <Box className="cell" sx={{ flex: 3 }}>
-                                {''}
-                              </Box>
+                          <Box
+                            className="cell"
+                            sx={{ flex: 1, '& p': { paddingLeft: '8px' } }}
+                          ></Box>
+                          <Box
+                            component="img"
+                            src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
+                            sx={{ width: '40px', height: '40px', borderRadius: 1, flex: 1 }}
+                            alt="Quảng cáo"
+                          />
+                          <Box className="cell" sx={{ flex: 6 }}></Box>
+                          <Box className="cell" sx={{ flex: 2 }}>
+                            {v.size}
+                          </Box>
+                          <Box className="cell" sx={{ flex: 2 }}>
+                            {v.color}
+                          </Box>
+                          <Box className="cell" sx={{ flex: 4 }} />
+                          <Box className="cell" sx={{ flex: 3 }}>
+                            {v.price
+                              ? v.price.toLocaleString('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND',
+                                })
+                              : 0}
+                          </Box>
+                          <Box className="cell" sx={{ flex: 2 }}>
+                            {v.inventory}
+                          </Box>
+                          <Box className="cell" sx={{ flex: 3 }}>
+                            <Box
+                              sx={{
+                                ...(v.inventory === 0
+                                  ? { border: '3px solid #f44336', color: '#f44336' }
+                                  : { border: '3px solid #4caf50', color: '#4caf50' }),
+                                fontSize: '13px',
+                                padding: '3px 7px',
+                                width: '100%',
+                                borderRadius: '5px',
+                              }}
+                            >
+                              {v.inventory === 0 ? 'Hết hàng' : 'Còn hàng'}
                             </Box>
-                          );
-                        })
-                      : null}
-                  </>
-                );
-              })
+                          </Box>
+                          <Box className="cell" sx={{ flex: 3 }}>
+                            {''}
+                          </Box>
+                        </Box>
+                      ))
+                    : null}
+                </>
+              ))
             )}
 
             <TablePagination

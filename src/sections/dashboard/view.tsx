@@ -2,15 +2,15 @@ import Box from '@mui/material/Box';
 import { alpha } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import SvgColor from 'src/components/svg-color';
+
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { useSettingsContext } from 'src/components/settings';
 import { useState } from 'react';
 import { LineChart } from '@mui/x-charts';
 import imageQC from '../../assets/images/qc/OIP.jpg';
 import imageQC2 from '../../assets/images/qc/OIP2.jpg';
-
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import SvgColor from 'src/components/svg-color';
 
 // ----------------------------------------------------------------------
 
@@ -26,31 +26,27 @@ export default function OneView() {
     quantityNewOrder: 0,
   });
 
-  let stt = -34;
+  const stt = -34;
 
   const columns: GridColDef<(typeof rows)[number]>[] = [
     {
       field: 'idd',
       headerName: 'STT',
       width: 70,
-      valueGetter: () => {
-        return stt++;
-      },
+      valueGetter: () => stt,
     },
     {
       field: 'mainImageUrl',
       width: 100,
       headerName: 'Ảnh',
       editable: false,
-      renderCell: (params) => {
-        return (
-          <img
-            src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
-            alt={params.row.name}
-            width="100%"
-          />
-        );
-      },
+      renderCell: (params) => (
+        <img
+          src={`https://th.bing.com/th/id/OIP.yWyGljqH30lzaGRF2seM5QHaDt?rs=1&pid=ImgDetMain`}
+          alt={params.row.name}
+          width="100%"
+        />
+      ),
     },
     {
       field: 'name',

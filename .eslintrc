@@ -25,7 +25,18 @@
   "rules": {
     "@typescript-eslint/lines-between-class-members": "off",
     "react/jsx-curly-brace-presence": "off",
-    //"perfectionist/sort-imports": "off",
+    "perfectionist/sort-imports": "off",
+    "class-methods-use-this": "off",
+    "import/no-cycle": "off",
+    "no-nested-ternary": "off",
+    "consistent-return": "off",
+    "no-else-return": "off",
+    "no-plusplus": "off",
+    "arrow-body-style": "off",
+    "object-shorthand": "off",
+    "array-callback-return": "off",
+    "react/jsx-no-constructed-context-values": "off",
+    "react-hooks/exhaustive-deps": "off",
     "react/self-closing-comp": "off",
     "no-alert": 0,
     "camelcase": 0,
@@ -111,40 +122,40 @@
         "order": "asc",
         "type": "line-length"
       }
-    ],
-    "perfectionist/sort-imports": [
-      1,
-      {
-        "order": "asc",
-        "type": "line-length",
-        "newlines-between": "always",
-        "groups": [
-          ["builtin", "external"],
-          "custom-mui",
-          "custom-routes",
-          "custom-hooks",
-          "custom-utils",
-          "internal",
-          "custom-components",
-          "custom-sections",
-          "custom-types",
-          ["parent", "sibling", "index"],
-          "object",
-          "unknown"
-        ],
-        "custom-groups": {
-          "value": {
-            "custom-mui": "@mui/**",
-            "custom-routes": "src/routes/**",
-            "custom-hooks": "src/hooks/**",
-            "custom-utils": "src/utils/**",
-            "custom-components": "src/components/**",
-            "custom-sections": "src/sections/**",
-            "custom-types": "src/types/**"
-          }
-        },
-        "internal-pattern": ["src/**"]
-      }
     ]
+    // "perfectionist/sort-imports": [
+    //   1,
+    //   {
+    //     "order": "asc",
+    //     "type": "line-length",
+    //     "newlines-between": "always",
+    //     "groups": [
+    //       ["builtin", "external"],
+    //       "custom-mui",
+    //       "custom-routes",
+    //       "custom-hooks",
+    //       "custom-utils",
+    //       "internal",
+    //       "custom-components",
+    //       "custom-sections",
+    //       "custom-types",
+    //       ["parent", "sibling", "index"],
+    //       "object",
+    //       "unknown"
+    //     ],
+    //     "custom-groups": {
+    //       "value": {
+    //         "custom-mui": "@mui/**",
+    //         "custom-routes": "src/routes/**",
+    //         "custom-hooks": "src/hooks/**",
+    //         "custom-utils": "src/utils/**",
+    //         "custom-components": "src/components/**",
+    //         "custom-sections": "src/sections/**",
+    //         "custom-types": "src/types/**"
+    //       }
+    //     },
+    //     "internal-pattern": ["src/**"]
+    //   }
+    // ]
   }
 }
