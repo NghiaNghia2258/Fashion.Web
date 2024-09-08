@@ -4,21 +4,32 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { useSettingsContext } from 'src/components/settings';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, TextField } from '@mui/material';
 
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AlertDialog from 'src/components/dialog/alert-dialog';
+import { CustomerDto } from 'src/sevices/DTOs/customer-dto';
+
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CreateCustomerView from './view-create-customer';
+import CustomerService from 'src/sevices/api/customer-service';
+import { OptionFilterCustomer } from 'src/sevices/paramas/option-fliter-customer';
 
 // ----------------------------------------------------------------------
 
 export default function CustomersView() {
   const settings = useSettingsContext();
-  const [optionFilter, setoptionFilter] = useState({});
-  const [open, setOpen] = useState(false);
+  const [optionFilter, setoptionFilter] = useState<OptionFilterCustomer>(
+    new OptionFilterCustomer()
+  );
+  const [open, setOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isOpenDialogCreateCustomer, setIsOpenDialogCreateCustomer] = useState<boolean>(false);
+  const [customerEdit, setCustomerEdit] = useState<CustomerDto>({});
 
   const handleDisagree = () => {
     setOpen(false);
@@ -27,38 +38,111 @@ export default function CustomersView() {
   const handleAgree = () => {
     setOpen(false);
   };
-  const [customers, setcustomers] = useState([
-    {
-      id: 1,
-      name: 'Customer1',
-      phone: '123',
-      gender: 'Nam',
-      point: 100,
-      createdName: 'NN',
-    },
-    {
-      id: 2,
-      name: 'Customer2',
-      phone: '456',
-      gender: 'Nữ',
-      point: 200,
-      createdName: 'NV',
-    },
-    {
-      id: 3,
-      name: 'Customer3',
-      phone: '789',
-      gender: 'Nam',
-      point: 300,
-      createdName: 'NN',
-    },
-  ]);
-
+  const [customers, setcustomers] = useState<CustomerDto[]>([]);
+  const renderRank = (paramas: any) => {
+    if (paramas.row.quarterlySpending >= 10000000) {
+      return (
+        <Box
+          sx={{
+            border: '2px solid',
+            height: '80%',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+          }}
+        >
+          Kim Cương
+        </Box>
+      );
+    } else if (paramas.row.quarterlySpending >= 5000000) {
+      return (
+        <Box
+          sx={{
+            border: '2px solid',
+            height: '80%',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+          }}
+        >
+          Bạch kim
+        </Box>
+      );
+    } else if (paramas.row.quarterlySpending >= 2000000) {
+      return (
+        <Box
+          sx={{
+            border: '2px solid',
+            height: '80%',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+          }}
+        >
+          Vàng
+        </Box>
+      );
+    } else if (paramas.row.quarterlySpending >= 1000000) {
+      return (
+        <Box
+          sx={{
+            border: '2px solid',
+            height: '80%',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+          }}
+        >
+          Bạc
+        </Box>
+      );
+    } else if (paramas.row.quarterlySpending >= 500000) {
+      return (
+        <Box
+          sx={{
+            border: '2px solid',
+            height: '80%',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 1,
+          }}
+        >
+          Đồng
+        </Box>
+      );
+    }
+    return (
+      <Box
+        sx={{
+          border: '1px solid',
+          height: '80%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      ></Box>
+    );
+  };
   const columns: GridColDef[] = [
+    {
+      field: 'code',
+      headerName: 'Mã KH',
+      width: 70,
+    },
     {
       field: 'name',
       headerName: 'Tên khách hàng',
-      width: 250,
+      width: 140,
     },
     {
       field: 'phone',
@@ -75,18 +159,46 @@ export default function CustomersView() {
       headerName: 'Tích điểm',
       width: 90,
     },
+
+    {
+      field: 'quarterlySpending',
+      headerName: 'Chi tiêu/90 ngày',
+      width: 140,
+      valueGetter: (value: number) => {
+        return `${value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`;
+      },
+    },
+    {
+      field: 'debt',
+      headerName: 'Công nợ',
+      width: 120,
+      valueGetter: (value: number) => {
+        return `${value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`;
+      },
+    },
     {
       field: 'createdName',
-      headerName: 'Người giới thiệu/Người tạo',
-      width: 250,
+      headerName: 'Người tạo',
+      width: 130,
+    },
+    {
+      field: 'createdNamea',
+      headerName: 'Hạng',
+      width: 100,
+      renderCell: (row) => renderRank(row),
     },
     {
       field: 'ida',
       headerName: 'Thao tác',
-      width: 200,
-      renderCell: () => (
+      width: 90,
+      renderCell: (gridRenderCellParams: GridRenderCellParams) => (
         <Box>
-          <EditIcon />
+          <EditIcon
+            onClick={() => {
+              setCustomerEdit(gridRenderCellParams.row);
+              setIsOpenDialogCreateCustomer(true);
+            }}
+          />
           <DeleteIcon
             onClick={() => {
               setOpen(true);
@@ -97,9 +209,35 @@ export default function CustomersView() {
     },
   ];
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const customerService = new CustomerService();
+      const res = await customerService.GetAll(optionFilter);
+      setcustomers(res.data);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
-      <Typography variant="h4">Danh sách khách hàng </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h4">Danh sách sản phẩm</Typography>
+
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setIsOpenDialogCreateCustomer(true)}
+          >
+            Thêm khách hàng
+            <ChevronRightIcon fontSize="small" />
+          </Button>
+        </Box>
+      </Box>
 
       <Box
         sx={{
@@ -161,6 +299,14 @@ export default function CustomersView() {
         }}
       >
         <DataGrid
+          sx={{
+            backgroundColor: '#fff',
+            '& .MuiDataGrid-cell': {
+              padding: '10px',
+              display: 'flex',
+              alignItems: 'center',
+            },
+          }}
           rows={customers}
           columns={columns}
           initialState={{
@@ -171,7 +317,6 @@ export default function CustomersView() {
             },
           }}
           pageSizeOptions={[5, 10, 15]}
-          checkboxSelection
           disableRowSelectionOnClick
         />
       </Box>
@@ -184,6 +329,20 @@ export default function CustomersView() {
         description="abc"
         title="Xác nhận xóa"
       />
+
+      {isOpenDialogCreateCustomer ? (
+        <CreateCustomerView
+          handleAgree={() => {
+            setIsOpenDialogCreateCustomer(false);
+            setCustomerEdit({});
+          }}
+          handleDisAgree={() => {
+            setIsOpenDialogCreateCustomer(false);
+            setCustomerEdit({});
+          }}
+          customerEdit={customerEdit}
+        />
+      ) : null}
     </Container>
   );
 }

@@ -20,6 +20,7 @@ const ProductDetailPage = lazy(() => import('src/pages/dashboard/productDetail')
 const CustomersPage = lazy(() => import('src/pages/dashboard/customers'));
 const OrdersPage = lazy(() => import('src/pages/dashboard/orders'));
 const OrderDetailPage = lazy(() => import('src/pages/dashboard/orderDetail'));
+const POSView = lazy(() => import('src/pages/dashboard/POS-v1'));
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ export const dashboardRoutes = [
       { path: 'two', element: <PageTwo /> },
       { path: 'three', element: <PageThree /> },
       { path: 'customer', element: <PageThree /> },
+      { path: 'pos-v1', element: <POSView /> },
       {
         path: 'group',
         children: [

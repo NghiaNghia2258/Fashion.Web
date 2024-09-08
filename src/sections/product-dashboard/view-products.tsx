@@ -58,7 +58,7 @@ export default function ProductsView() {
     setLoading(true);
     const res = await productServices.GetAll(optionFilter);
     if (res.isSucceeded) {
-      setProducts(res.data ?? []);
+      setProducts(res.data);
       settotalRecordsCount(res.totalRecordsCount ?? 0);
     }
     setLoading(false);
@@ -97,11 +97,11 @@ export default function ProductsView() {
       const productServices = new ProductService();
       const productCategoryService = new ProductCategoryService();
       productCategoryService.GetAll().then((res) => {
-        setcategories(res.data ?? []);
+        setcategories(res.data);
       });
       const res = await productServices.GetAll(optionFilter);
       if (res.isSucceeded) {
-        setProducts(res.data ?? []);
+        setProducts(res.data);
         settotalRecordsCount(res.totalRecordsCount ?? 0);
       }
     };

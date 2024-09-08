@@ -128,7 +128,7 @@ export default function DashboardLayout({ children }: Props) {
       <Collapse
         className="toast"
         in={toast.open}
-        sx={{ position: 'fixed', top: 30, right: 10, zIndex: 1101, ...toast.sx }}
+        sx={{ position: 'fixed', top: 30, right: 10, zIndex: 99999, ...toast.sx }}
       >
         <Alert severity={toast.severity}>
           <AlertTitle>{toast.title}</AlertTitle>

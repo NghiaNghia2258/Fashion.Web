@@ -148,6 +148,7 @@ export default class OrderService {
     return {
       isSucceeded: false,
       message: response.message,
+      data: {},
     };
   }
   async Create(order: OrderDto): Promise<ApiResult<string>> {
@@ -166,9 +167,10 @@ export default class OrderService {
     return {
       isSucceeded: false,
       message: response.message,
+      data: '',
     };
   }
-  async Update(order: OrderDto): Promise<ApiResult<void>> {
+  async Update(order: OrderDto): Promise<ApiResult<boolean>> {
     await delay(2000);
     const response = {
       isSucceeded: true,
@@ -177,11 +179,31 @@ export default class OrderService {
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
+        data: true,
       };
     }
     return {
       isSucceeded: false,
       message: response.message,
+      data: false,
+    };
+  }
+  async Payment(order: OrderDto): Promise<ApiResult<boolean>> {
+    await delay(2000);
+    const response = {
+      isSucceeded: true,
+      message: '',
+    };
+    if (response.isSucceeded) {
+      return {
+        isSucceeded: true,
+        data: true,
+      };
+    }
+    return {
+      isSucceeded: false,
+      message: response.message,
+      data: false,
     };
   }
 }

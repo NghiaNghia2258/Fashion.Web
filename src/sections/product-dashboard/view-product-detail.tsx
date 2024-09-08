@@ -177,7 +177,7 @@ export default function ProductDetailView() {
   useEffect(() => {
     const productCategoryService = new ProductCategoryService();
     productCategoryService.GetAll().then((res) => {
-      setcategories(res.data ?? []);
+      setcategories(res.data);
     });
     const productService = new ProductService();
     productService.GetById(params.id ?? '').then((res) => {

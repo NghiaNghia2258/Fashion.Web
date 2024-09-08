@@ -178,7 +178,7 @@ export default function CreateProductView() {
   useEffect(() => {
     const productCategoryService = new ProductCategoryService();
     productCategoryService.GetAll().then((res) => {
-      setcategories(res.data ?? []);
+      setcategories(res.data);
     });
   }, []);
 

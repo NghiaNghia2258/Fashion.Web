@@ -29,7 +29,7 @@ export default function OrdersView() {
       setLoading(true);
       const orderService = new OrderService();
       const res = await orderService.GetAll(optionFilter);
-      setOrders(res.data ?? []);
+      setOrders(res.data);
       setTotalRecordsCount(res.totalRecordsCount ?? 0);
       setLoading(false);
     };
@@ -217,7 +217,7 @@ export default function OrdersView() {
             setLoading(true);
             const orderService = new OrderService();
             const res = await orderService.GetAll(optionFilter);
-            setOrders(res.data ?? []);
+            setOrders(res.data);
             setTotalRecordsCount(res.totalRecordsCount ?? 0);
             setLoading(false);
           }}
@@ -320,7 +320,7 @@ export default function OrdersView() {
               ...optionFilter,
               pageIndex: newPage + 1,
             });
-            setOrders(res.data ?? []);
+            setOrders(res.data);
             setTotalRecordsCount(res.totalRecordsCount ?? 0);
             setLoading(false);
           }}
@@ -339,7 +339,7 @@ export default function OrdersView() {
               pageSize: parseInt(event.target.value, 10),
               pageIndex: 1,
             });
-            setOrders(res.data ?? []);
+            setOrders(res.data);
             setTotalRecordsCount(res.totalRecordsCount ?? 0);
             setLoading(false);
           }}

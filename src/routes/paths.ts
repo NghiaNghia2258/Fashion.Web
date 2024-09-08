@@ -24,6 +24,7 @@ export const paths = {
     three: `${ROOTS.DASHBOARD}/three`,
     customer: `${ROOTS.DASHBOARD}/customers`,
     setting: `${ROOTS.DASHBOARD}/setting`,
+    POS: `${ROOTS.DASHBOARD}/pos-v1`,
 
     group: {
       root: `${ROOTS.DASHBOARD}/group`,

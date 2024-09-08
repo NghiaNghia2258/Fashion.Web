@@ -76,7 +76,7 @@ export function useNavData() {
           },
           {
             title: 'Bán hàng tại quầy',
-            path: paths.dashboard.setting,
+            path: paths.dashboard.POS,
             icon: ICONS.analytics,
           },
           {
