@@ -1,4 +1,5 @@
 import { OrderDto } from '../DTOs/order-dto';
+import { VoucherDto } from '../DTOs/voucher-dto';
 import { OptionFilterOrder } from '../paramas/option-filter-order';
 import { ApiResult } from './api-result';
 
@@ -170,7 +171,7 @@ export default class OrderService {
     await delay(2000);
     const response = {
       isSucceeded: true,
-      message: '',
+      message: 'Hello order {order } is successfully created and is available at {order location }',
       data: 'HD005',
     };
     if (response.isSucceeded) {
@@ -219,6 +220,36 @@ export default class OrderService {
       isSucceeded: false,
       message: response.message,
       data: false,
+    };
+  }
+  async GetVoucher(voucherCode: string): Promise<ApiResult<VoucherDto>> {
+    const response = {
+      isSucceeded: true,
+      message: '',
+      data: {
+        id: '1',
+        voucherCode: 'XBSA-ANMH-LGFD-AUNS',
+        title: 'Voucher giảm giá 10%',
+        discountPercent: 0.1,
+        discountValue: 0,
+        maxDiscountValue: 50000,
+        minOrderValue: 300000,
+        usageLimit: 2,
+        description: 'Áp dụng cho đơn hàng đã thanh toán trước',
+        startDate: new Date('2024-01-31'),
+        expirationDate: new Date('2024-12-31'),
+      },
+    };
+    if (response.isSucceeded) {
+      return {
+        isSucceeded: true,
+        data: response.data,
+      };
+    }
+    return {
+      isSucceeded: false,
+      message: response.message,
+      data: {},
     };
   }
 }

@@ -39,10 +39,10 @@ export default function ProductsView() {
   const toast = useContext(DashboardContext);
   const router = useRouter();
 
-  const [open, setOpen] = useState<boolean>(false);
   const [totalRecordsCount, settotalRecordsCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [idDelete, setidDelete] = useState<string>('');
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleDisagree = () => {
     setOpen(false);

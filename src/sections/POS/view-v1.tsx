@@ -1,10 +1,8 @@
 import Box from '@mui/material/Box';
-import { alpha } from '@mui/material/styles';
-import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { useSettingsContext } from 'src/components/settings';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { OrderDto } from 'src/sevices/DTOs/order-dto';
 import { ProductDto } from 'src/sevices/DTOs/product-dto';
 import { ProductCategoryDto } from 'src/sevices/DTOs/product-category-dto';
@@ -16,7 +14,7 @@ import ProductCategoryService from 'src/sevices/api/product-category-services';
 import { OptionFilterProduct } from 'src/sevices/paramas/option-filter-product';
 import { OptionFilterOrder } from 'src/sevices/paramas/option-filter-order';
 import OrderItemService from 'src/sevices/api/order-item-services';
-import { Button, TextField } from '@mui/material';
+import { Button, TablePagination, TextField } from '@mui/material';
 import { InputFile } from 'src/components/file-thumbnail';
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -28,20 +26,25 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import SendIcon from '@mui/icons-material/Send';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import { CustomerDto } from 'src/sevices/DTOs/customer-dto';
 import CreateCustomerView from '../customer-dashboard/view-create-customer';
+import { DashboardContext } from 'src/layouts/dashboard';
+import AlertDialog from 'src/components/dialog/alert-dialog';
 
 // ----------------------------------------------------------------------
 
 export default function POSv1View() {
   const settings = useSettingsContext();
+  const toast = useContext(DashboardContext);
 
   const [isScreen1, setIsScreen1] = useState<boolean>(true);
   const [isScreen2, setIsScreen2] = useState<boolean>(false);
   const [loadingProduct, setLoadingProduct] = useState<boolean>(false);
   const [loadingOrder, setLoadingOrder] = useState<boolean>(false);
+  const [isErrGetVoucher, setIsErrGetVoucher] = useState<boolean>(false);
 
   const [orders, setOrders] = useState<OrderDto[]>([]);
   const [products, setProducts] = useState<ProductDto[]>([]);
@@ -61,11 +64,73 @@ export default function POSv1View() {
   const [newOrderItem, setNewOrderItem] = useState<OrderItemDto>({
     quantity: 1,
   });
+  const [optionFilter, setoptionFilter] = useState<OptionFilterProduct>({
+    pageSize: 5,
+    pageIndex: 1,
+    name: null,
+    categoryId: null,
+  });
+  const [totalRecordsCount, setTotalRecordsCount] = useState<number>(0);
 
   const [isOpenDialogCreateCustomer, setIsOpenDialogCreateCustomer] = useState<boolean>(false);
   const [isOpenDialogProductVariant, setIsOpenDialogProductVariant] = useState<boolean>(false);
   const [isOpenDialogWriteNote, setIsOpenDialogWriteNote] = useState<boolean>(false);
   const [isOpenDialogDiscount, setIsOpenDialogDiscount] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleDisagree = () => {
+    setOpen(false);
+  };
+
+  const handleAgree = () => {
+    setOpen(false);
+
+    const orderSevice = new OrderService();
+    setLoadingOrder(true);
+    orderSevice.GetAll(new OptionFilterOrder()).then((res) => {
+      setOrders(res.data);
+      setLoadingOrder(false);
+    });
+    orderSelected.status = 6;
+    orderSevice.Update(orderSelected).then((res) => {
+      if (res.isSucceeded) {
+        setIsScreen1(true);
+        setIsScreen2(false);
+      } else {
+        toast?.ShowToast({
+          severity: 'error',
+          description: res.message,
+          autoHideDuration: 3000,
+          title: 'Có lỗi xảy ra',
+        });
+      }
+    });
+    setOrderSelected({});
+    setItemsOfOrderSelected([]);
+    setVariantOfProductSelected([]);
+  };
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: any[]) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId); // Xóa timeout cũ nếu có
+      }
+      timeoutId = setTimeout(() => {
+        func(...args); // Gọi hàm với các tham số truyền vào sau khi hết delay
+      }, delay);
+    };
+  };
+  const callApiSearchProduct = async (searchTerm: string) => {
+    setLoadingProduct(true);
+    const productService = new ProductService();
+    const res = await productService.GetAll({
+      ...optionFilter,
+      name: searchTerm,
+    });
+    setProducts(res.data);
+    setLoadingProduct(false);
+  };
+  const debouncedApiCall = useRef(debounce(callApiSearchProduct, 500)).current;
 
   useEffect(() => {
     const orderSevice = new OrderService();
@@ -79,9 +144,10 @@ export default function POSv1View() {
     const productService = new ProductService();
     setLoadingProduct(true);
     productService
-      .GetAll(new OptionFilterProduct())
+      .GetAll(optionFilter)
       .then((res) => {
         setProducts(res.data);
+        setTotalRecordsCount(res.totalRecordsCount ?? 0);
       })
       .finally(() => setLoadingProduct(false));
     const productCategoryService = new ProductCategoryService();
@@ -550,7 +616,11 @@ export default function POSv1View() {
               variant="standard"
               size="small"
               type="number"
-              value={optionDiscount.discountValue}
+              value={
+                optionDiscount.discountValue
+                  ? optionDiscount.discountValue
+                  : orderSelected.discountValue
+              }
               onChange={(e) => {
                 if (parseInt(e.target.value, 10) > 1) {
                   setOptionDiscount({
@@ -574,7 +644,11 @@ export default function POSv1View() {
               variant="standard"
               size="small"
               type="number"
-              value={(newOrderItem.discountPercent ?? 0) * 100}
+              value={
+                (optionDiscount.discountPercent
+                  ? optionDiscount.discountPercent
+                  : orderSelected.discountPercent) * 100
+              }
               onChange={(e) => {
                 if (parseInt(e.target.value, 10) > 1) {
                   setOptionDiscount({
@@ -592,22 +666,32 @@ export default function POSv1View() {
             />
             <Typography variant="body2"> %</Typography>
           </Box>
-          <Box
-            className="discountPercent"
-            sx={{ display: 'flex', gap: 1, alignItems: 'end', margin: '10px 0' }}
-          >
+          <Box className="discountPercent" sx={{ display: 'flex', gap: 1, margin: '10px 0' }}>
             <Typography variant="body2">Voucher</Typography>
             <TextField
-              sx={{ width: '35%' }}
+              sx={{ width: '45%' }}
               variant="standard"
+              error={isErrGetVoucher}
+              helperText={isErrGetVoucher ? 'Mã giảm giá không hợp lệ' : ''}
               size="small"
               type="text"
-              value={optionDiscount.voucher}
-              onChange={(e) => {
-                setOptionDiscount({
-                  ...optionDiscount,
-                  voucher: e.target.value,
-                });
+              value={
+                optionDiscount.voucher
+                  ? optionDiscount.voucher.voucherCode
+                  : (orderSelected.voucher ?? {}).voucherCode
+              }
+              onBlur={async (e) => {
+                const orderSevice = new OrderService();
+                const res = await orderSevice.GetVoucher(e.target.value);
+                if (res.isSucceeded) {
+                  setOptionDiscount({
+                    ...optionDiscount,
+                    voucher: res.data,
+                  });
+                  setIsErrGetVoucher(false);
+                } else {
+                  setIsErrGetVoucher(true);
+                }
               }}
             />
           </Box>
@@ -629,6 +713,7 @@ export default function POSv1View() {
             sx={{ height: '40px', width: '80px' }}
             onClick={() => {
               setIsOpenDialogDiscount(false);
+              setOptionDiscount({});
             }}
             variant="contained"
             color="error"
@@ -641,6 +726,17 @@ export default function POSv1View() {
             sx={{ height: '40px' }}
             onClick={() => {
               setIsOpenDialogDiscount(false);
+              setOptionDiscount({});
+              setOrderSelected({
+                ...orderSelected,
+                discountValue: optionDiscount.discountValue
+                  ? optionDiscount.discountValue
+                  : orderSelected.discountValue,
+                discountPercent: optionDiscount.discountPercent
+                  ? optionDiscount.discountPercent
+                  : orderSelected.discountPercent,
+                voucher: optionDiscount.voucher,
+              });
             }}
             variant="contained"
             color="success"
@@ -654,14 +750,11 @@ export default function POSv1View() {
     </Box>
   );
 
-  const handlePayment = async (order: OrderDto): Promise<void> => {};
   const handleFilterProductByCategory = async (
     category: ProductCategoryDto | null
   ): Promise<void> => {};
   const handleFilterProductByWord = async (word: string | null): Promise<void> => {};
   const handleSaveOrderToDB = async (): Promise<void> => {
-    setIsScreen1(true);
-    setIsScreen2(false);
     setOrderSelected({});
     setItemsOfOrderSelected([]);
     setVariantOfProductSelected([]);
@@ -670,6 +763,19 @@ export default function POSv1View() {
     orderSevice.GetAll(new OptionFilterOrder()).then((res) => {
       setOrders(res.data);
       setLoadingOrder(false);
+    });
+    orderSevice.Update(orderSelected).then((res) => {
+      if (res.isSucceeded) {
+        setIsScreen1(true);
+        setIsScreen2(false);
+      } else {
+        toast?.ShowToast({
+          severity: 'error',
+          description: res.message,
+          autoHideDuration: 3000,
+          title: 'Có lỗi xảy ra',
+        });
+      }
     });
   };
 
@@ -712,14 +818,14 @@ export default function POSv1View() {
       }}
       sx={{
         border: '1px solid',
-        width: '180px',
+        width: '105px',
         cursor: 'pointer',
         borderRadius: '3px',
       }}
     >
       <Box>
         <InputFile
-          imgSx={{ width: '100%', height: '80%', borderRadius: 1 }}
+          imgSx={{ width: '105px', height: '80px', borderRadius: 1 }}
           file={
             'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg'
           }
@@ -760,15 +866,20 @@ export default function POSv1View() {
           },
         }}
         onClick={() => {
+          setoptionFilter({
+            ...optionFilter,
+            categoryId: null,
+          });
           const productService = new ProductService();
           setLoadingProduct(true);
           productService
             .GetAll({
-              pageIndex: 1,
-              pageSize: 10,
+              ...optionFilter,
+              categoryId: null,
             })
             .then((res) => {
               setProducts(res.data);
+              setTotalRecordsCount(res.totalRecordsCount ?? 0);
             })
             .finally(() => setLoadingProduct(false));
         }}
@@ -796,16 +907,20 @@ export default function POSv1View() {
             },
           }}
           onClick={() => {
+            setoptionFilter({
+              ...optionFilter,
+              categoryId: category.id,
+            });
             const productService = new ProductService();
             setLoadingProduct(true);
             productService
               .GetAll({
-                pageIndex: 1,
-                pageSize: 10,
+                ...optionFilter,
                 categoryId: category.id,
               })
               .then((res) => {
                 setProducts(res.data);
+                setTotalRecordsCount(res.totalRecordsCount ?? 0);
               })
               .finally(() => setLoadingProduct(false));
           }}
@@ -907,7 +1022,34 @@ export default function POSv1View() {
         >
           {loadingOrder ? <CircularProgress key={4} sx={{ margin: '0 45%' }} /> : renderListOrder}
         </Box>
-        <Box sx={{ flex: 3, height: 100, border: '1px solid' }}></Box>
+        <Box sx={{ flex: 3, height: 100, border: '1px solid', padding: '15px' }}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setIsScreen1(false);
+              setIsScreen2(true);
+              setOrderSelected({});
+              const orderSevice = new OrderService();
+              orderSevice.Create({}).then((res) => {
+                if (!res.isSucceeded) {
+                  setIsScreen1(true);
+                  setIsScreen2(false);
+                  toast?.ShowToast({
+                    severity: 'error',
+                    description: res.message,
+                    autoHideDuration: 3000,
+                    title: 'Có lỗi xảy ra',
+                  });
+                }
+              });
+            }}
+          >
+            Tạo mới hóa đơn
+            <ChevronRightIcon fontSize="small" />
+          </Button>
+        </Box>
       </Box>
     );
   }
@@ -933,7 +1075,7 @@ export default function POSv1View() {
         >
           {renderListCategory}
         </Box>
-        <Box sx={{ flex: 9 }}>
+        <Box sx={{ flex: 9, position: 'relative' }}>
           <Box marginBottom={2} sx={{ display: 'flex', alignItems: 'end', gap: 1 }}>
             <SearchIcon />
             <TextField
@@ -941,18 +1083,75 @@ export default function POSv1View() {
               label="Nhập tên sản phẩm"
               sx={{ width: '90%' }}
               onChange={(event) => {
-                //   if (event.target.value.length < 6) {
-                //     setisErrInputName(true);
-                //   } else {
-                //     setisErrInputName(false);
-                //     setnewProduct({ ...newProduct, name: event.target.value });
-                //   }
+                const searchTerm = event.target.value;
+                debouncedApiCall(searchTerm); // Gọi hàm debounce
               }}
             />
           </Box>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, padding: '10px 0' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1,
+              padding: '10px 0',
+            }}
+          >
             {loadingProduct ? <CircularProgress sx={{ margin: '0 45%' }} /> : renderListProduct}
           </Box>
+          <TablePagination
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+            }}
+            component="div"
+            rowsPerPageOptions={[5, 10, 15]}
+            rowsPerPage={optionFilter.pageSize}
+            page={optionFilter.pageIndex - 1}
+            onPageChange={(e, newPage) => {
+              setoptionFilter({
+                ...optionFilter,
+                pageIndex: newPage + 1,
+              });
+              const productService = new ProductService();
+              setLoadingProduct(true);
+              productService
+                .GetAll({
+                  ...optionFilter,
+                  pageIndex: newPage + 1,
+                })
+                .then((res) => {
+                  setProducts(res.data);
+                  setTotalRecordsCount(res.totalRecordsCount ?? 0);
+                })
+                .finally(() => setLoadingProduct(false));
+            }}
+            onRowsPerPageChange={(
+              event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            ) => {
+              setoptionFilter({
+                ...optionFilter,
+                pageSize: parseInt(event.target.value, 10),
+                pageIndex: 1,
+              });
+              const productService = new ProductService();
+              setLoadingProduct(true);
+              productService
+                .GetAll({
+                  ...optionFilter,
+                  pageSize: parseInt(event.target.value, 10),
+                  pageIndex: 1,
+                })
+                .then((res) => {
+                  setProducts(res.data);
+                  setTotalRecordsCount(res.totalRecordsCount ?? 0);
+                })
+                .finally(() => setLoadingProduct(false));
+            }}
+            labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
+            labelRowsPerPage="Số sản phẩm/trang"
+            count={totalRecordsCount}
+          />
         </Box>
       </Box>
       <Box sx={{ flex: 5, border: '1px solid', borderRadius: 1, overflow: 'hidden' }}>
@@ -1086,7 +1285,13 @@ export default function POSv1View() {
           <Button sx={{ flex: 1, borderRadius: '0px' }} onClick={() => {}} variant="contained">
             Tạm tính
           </Button>
-          <Button sx={{ flex: 1, borderRadius: '0px' }} onClick={() => {}} variant="contained">
+          <Button
+            sx={{ flex: 1, borderRadius: '0px' }}
+            onClick={() => {
+              setOpen(true);
+            }}
+            variant="contained"
+          >
             Thanh toán
           </Button>
         </Box>
@@ -1106,6 +1311,16 @@ export default function POSv1View() {
       {isOpenDialogProductVariant ? dialogProductVariant : null}
       {isOpenDialogWriteNote ? dialogWirteNote : null}
       {isOpenDialogDiscount ? dialogDiscount : null}
+
+      <AlertDialog
+        isOpen={open}
+        labelAgree="Xác nhận"
+        labelDisagree="Hủy"
+        handleAgree={handleAgree}
+        handleDisagree={handleDisagree}
+        description=""
+        title="Xác nhận thanh toán"
+      />
     </Box>
   );
 }

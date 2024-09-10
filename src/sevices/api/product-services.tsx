@@ -9,7 +9,7 @@ function delay(ms: number): Promise<void> {
 export default class ProductService {
   async GetAll(options: OptionFilterProduct): Promise<ApiResult<ProductDto[]>> {
     // const response = await axios.post('/products', { params: options });
-    await delay(2000);
+    await delay(300);
     const response = {
       isSucceeded: true,
       message: '',
@@ -89,6 +89,26 @@ export default class ProductService {
           categoryId: '12',
           categoryName: 'Accessories',
           productVariants: [],
+        },
+        {
+          id: '5',
+          name: 'Electronics',
+          nameEn: 'Electronics',
+          description: 'High-quality electronics.',
+          mainImageUrl: 'https://example.com/images/electronics.jpg',
+          categoryId: '13',
+          categoryName: 'Electronics',
+          productVariants: [
+            {
+              id: '501',
+              size: '10',
+              color: 'Black',
+              price: 299999,
+              imageUrl:
+                'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
+              inventory: 50,
+            },
+          ],
         },
       ],
     };
