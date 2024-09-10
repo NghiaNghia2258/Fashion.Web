@@ -22,4 +22,6 @@ export interface ProductVariantDto {
   orderItems?: OrderItemDto[];
   product?: ProductDto;
   fileImage?: File | null;
+  isDisabled?: boolean;
+  isActivate?: boolean;
 }

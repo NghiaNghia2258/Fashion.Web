@@ -11,6 +11,7 @@ export interface OrderItemDto {
   unitPrice?: number;
   discountPercent?: number;
   discountValue?: number;
+  isDeleted?: boolean;
 
   order?: OrderDto;
   productVariant?: ProductVariantDto;

@@ -23,6 +23,10 @@ export default class ProductCategoryService {
           id: '3',
           name: 'Category 3',
         },
+        {
+          id: '4',
+          name: 'Sản phẩm mùa đông',
+        },
       ],
       totalRecordsCount: 30,
     };

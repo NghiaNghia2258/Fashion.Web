@@ -30,7 +30,7 @@ export default class ProductService {
               color: 'Red',
               price: 199999,
               imageUrl: 'https://example.com/images/tshirt-red-m.jpg',
-              inventory: 0,
+              inventory: 20,
             },
             {
               id: '102',

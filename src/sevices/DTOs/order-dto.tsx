@@ -6,6 +6,7 @@ import { VoucherDto } from './voucher-dto';
 export interface OrderDto {
   id?: string;
   code?: string; // new column
+  name?: string; // new column
   note?: string;
   customerNote?: string;
   paymentStatus?: string;

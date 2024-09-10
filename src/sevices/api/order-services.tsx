@@ -8,7 +8,7 @@ function delay(ms: number): Promise<void> {
 
 export default class OrderService {
   async GetAll(option: OptionFilterOrder): Promise<ApiResult<OrderDto[]>> {
-    await delay(2000);
+    await delay(300);
     const response = {
       isSucceeded: true,
       message: '',
@@ -17,6 +17,20 @@ export default class OrderService {
         {
           id: '1',
           code: 'HD001',
+          name: 'Chị Hà',
+          customerName: 'Nguyễn Văn A',
+          createdAt: new Date('2024-09-06'),
+          createdName: 'Trần B',
+          totalPrice: 1000000,
+          discountValue: 100000,
+          discountPercent: 0.1,
+          tax: 0.05,
+          status: 1,
+        },
+        {
+          id: '5',
+          code: 'HD005',
+          name: 'Chị My cạnh 6789',
           customerName: 'Nguyễn Văn A',
           createdAt: new Date('2024-09-06'),
           createdName: 'Trần B',
@@ -41,6 +55,7 @@ export default class OrderService {
         {
           id: '3',
           code: 'HD003',
+          name: 'Ship lllllllllllllllllllllllllllllllllllllll',
           customerName: 'Nguyễn Văn C',
           createdAt: new Date('2024-09-08'),
           createdName: 'Trần D',

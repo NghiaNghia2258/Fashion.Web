@@ -28,9 +28,9 @@ export default function CustomersView() {
   );
   const [open, setOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [isOpenDialogCreateCustomer, setIsOpenDialogCreateCustomer] = useState<boolean>(false);
   const [customerEdit, setCustomerEdit] = useState<CustomerDto>({});
 
+  const [isOpenDialogCreateCustomer, setIsOpenDialogCreateCustomer] = useState<boolean>(false);
   const handleDisagree = () => {
     setOpen(false);
   };
@@ -171,7 +171,7 @@ export default function CustomersView() {
     {
       field: 'debt',
       headerName: 'Công nợ',
-      width: 120,
+      width: 110,
       valueGetter: (value: number) => {
         return `${value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`;
       },
@@ -179,7 +179,7 @@ export default function CustomersView() {
     {
       field: 'createdName',
       headerName: 'Người tạo',
-      width: 130,
+      width: 145,
     },
     {
       field: 'createdNamea',
