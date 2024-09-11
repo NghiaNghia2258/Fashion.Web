@@ -33,6 +33,7 @@ import { CustomerDto } from 'src/sevices/DTOs/customer-dto';
 import CreateCustomerView from '../customer-dashboard/view-create-customer';
 import { DashboardContext } from 'src/layouts/dashboard';
 import AlertDialog from 'src/components/dialog/alert-dialog';
+import CustomerService from 'src/sevices/api/customer-service';
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +43,8 @@ export default function POSv1View() {
 
   const [isScreen1, setIsScreen1] = useState<boolean>(true);
   const [isScreen2, setIsScreen2] = useState<boolean>(false);
+  const [isOpenAutoComplate, setIsOpenAutoComplate] = useState<boolean>(false);
+
   const [loadingProduct, setLoadingProduct] = useState<boolean>(false);
   const [loadingOrder, setLoadingOrder] = useState<boolean>(false);
   const [isErrGetVoucher, setIsErrGetVoucher] = useState<boolean>(false);
@@ -130,7 +133,19 @@ export default function POSv1View() {
     setProducts(res.data);
     setLoadingProduct(false);
   };
+
+  const callApiSearchCustomer = async (searchTerm: string) => {
+    const customerService = new CustomerService();
+    const res = await customerService.GetAll({
+      pageSize: 10,
+      pageIndex: 1,
+      nameOrPhone: searchTerm,
+    });
+    setCustomers(res.data);
+  };
+
   const debouncedApiCall = useRef(debounce(callApiSearchProduct, 500)).current;
+  const debouncedApiCallSearchCustomer = useRef(debounce(callApiSearchCustomer, 500)).current;
 
   useEffect(() => {
     const orderSevice = new OrderService();
@@ -164,7 +179,6 @@ export default function POSv1View() {
     });
   }, [orderSelected]);
   useEffect(() => {
-    console.log(productVariantSelected);
     const colors = Array.from(
       new Set(variantOfProductSelected.flatMap((variant) => variant.color))
     );
@@ -1063,6 +1077,7 @@ export default function POSv1View() {
           border: '1px solid',
           borderRadius: 1,
           gap: 2,
+          height: '87vh',
         }}
       >
         <Box
@@ -1071,6 +1086,9 @@ export default function POSv1View() {
             paddingBottom: '5px',
             borderRight: '1px solid',
             flex: 2,
+            height: '87vh',
+            overflow: 'scroll',
+            scrollbarWidth: 'none',
           }}
         >
           {renderListCategory}
@@ -1154,10 +1172,12 @@ export default function POSv1View() {
           />
         </Box>
       </Box>
-      <Box sx={{ flex: 5, border: '1px solid', borderRadius: 1, overflow: 'hidden' }}>
+      <Box
+        sx={{ flex: 5, border: '1px solid', borderRadius: 1, overflow: 'hidden', height: '87vh' }}
+      >
         <Box
           sx={{
-            height: '20vh',
+            height: '24%',
             borderBottom: '1px solid',
             padding: '10px',
           }}
@@ -1167,17 +1187,81 @@ export default function POSv1View() {
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'end' }}>
             <SearchIcon />
-            <Autocomplete
-              sx={{ width: '80%' }}
-              options={customers}
-              getOptionLabel={(customer) => `${customer.name} - ${customer.phone}`}
-              id="auto-complete"
-              autoComplete
-              includeInputInList
-              renderInput={(params) => (
-                <TextField {...params} label="Khách hàng" variant="standard" />
-              )}
-            />
+            <Box sx={{ width: '90%', position: 'relative' }}>
+              <TextField
+                variant="standard"
+                placeholder="Nhập tên/SDT khách hàng"
+                sx={{ width: '100%' }}
+                size="small"
+                type="text"
+                onBlur={() => {
+                  setTimeout(() => {
+                    setIsOpenAutoComplate(false);
+                  }, 250);
+                }}
+                onFocus={() => {
+                  setIsOpenAutoComplate(true);
+                }}
+                onChange={(e) => {
+                  debouncedApiCallSearchCustomer(e.target.value);
+                }}
+              />
+              {isOpenAutoComplate ? (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: '200px',
+                    border: '1px solid',
+                    position: 'absolute',
+                    backgroundColor: '#fff',
+                    borderRadius: '4px',
+                    zIndex: 10,
+                    top: 33,
+                    overflow: 'scroll',
+                    scrollbarWidth: 'none',
+                  }}
+                >
+                  {customers.map((customer) => (
+                    <Box
+                      onClick={() => {
+                        setOrderSelected({
+                          ...orderSelected,
+                          customer: customer,
+                          customerName: customer.name,
+                          customerPhone: customer.phone,
+                          customerId: customer.id,
+                        });
+                      }}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '10px 30px',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid',
+
+                        '&:hover': {
+                          backgroundColor: '#e8e8e8',
+                        },
+                      }}
+                    >
+                      <Box>
+                        <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>
+                          {customer.name}
+                        </Typography>
+                        <Typography sx={{ fontSize: '13px', color: '#9c9b9b' }}>
+                          Mã :{customer.code}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography sx={{ fontSize: '13px', color: '#9c9b9b' }}>
+                          SDT :{customer.phone}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              ) : null}
+            </Box>
             <PlaylistAddIcon
               onClick={() => {
                 setIsOpenDialogCreateCustomer(true);
@@ -1185,20 +1269,35 @@ export default function POSv1View() {
               sx={{ fontSize: '28px', cursor: 'pointer' }}
             />
           </Box>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'end', marginTop: '5px' }}>
-            <Typography>Người tạo</Typography>
-            <Typography sx={{ fontWeight: 700 }}>{orderSelected.createdName}</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'end' }}>
-            <Typography>Ngày tạo</Typography>
-            <Typography sx={{ fontWeight: 700 }}>
-              {orderSelected.createdAt?.toDateString()}
-            </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Box
+              sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end', marginTop: '5px' }}
+            >
+              <Typography sx={{ fontSize: 13 }}>Khách hàng: </Typography>
+              <Typography sx={{ fontWeight: 700 }}>{orderSelected.customerName}</Typography>
+            </Box>
+            <Box
+              sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end', marginTop: '5px' }}
+            >
+              <Typography sx={{ fontSize: 13 }}>Người tạo</Typography>
+              <Typography sx={{ fontWeight: 700 }}>{orderSelected.createdName}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end' }}>
+              <Typography sx={{ fontSize: 13 }}>SDT: </Typography>
+              <Typography sx={{ fontWeight: 700 }}>{orderSelected.customerPhone}</Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end' }}>
+              <Typography sx={{ fontSize: 13 }}>Ngày tạo</Typography>
+              <Typography sx={{ fontWeight: 700 }}>
+                {orderSelected.createdAt?.toLocaleDateString()}
+              </Typography>
+            </Box>
           </Box>
         </Box>
         <Box
           sx={{
-            height: '50vh',
+            height: '55%',
             borderBottom: '1px solid',
             padding: '10px',
           }}
@@ -1218,12 +1317,14 @@ export default function POSv1View() {
             <Box sx={{ flex: 4 }}>Thành tiền</Box>
             <Box sx={{ flex: 1 }}></Box>
           </Box>
-          <Box sx={{ overflow: 'scroll', height: '90%' }}>{renderListOrderItem}</Box>
+          <Box sx={{ overflow: 'scroll', height: '90%', scrollbarWidth: 'none' }}>
+            {renderListOrderItem}
+          </Box>
         </Box>
         <Box
           sx={{
             borderBottom: '1px solid',
-            height: '46px',
+            height: '7%',
           }}
         >
           <DiscountIcon
@@ -1255,7 +1356,7 @@ export default function POSv1View() {
             }}
           />
         </Box>
-        <Box sx={{ display: 'flex', height: '10vh' }}>
+        <Box sx={{ display: 'flex', height: '14%' }}>
           <Button
             sx={{ flex: 1, borderRadius: '0px' }}
             onClick={() => {

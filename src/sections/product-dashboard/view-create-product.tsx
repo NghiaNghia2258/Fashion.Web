@@ -56,6 +56,7 @@ export default function CreateProductView() {
   const [price, setprice] = useState<number>(0);
   const [inventory, setinventory] = useState<number>(0);
   const [images, setImages] = useState<File[]>([]);
+  const [mainImage, setMainImage] = useState<File | null>(null);
   const [details, setdetails] = useState<ProductVariantDto[]>([]);
 
   const [isOpenDialogCreate, setisOpenDialogCreate] = useState(false);
@@ -83,7 +84,7 @@ export default function CreateProductView() {
         };
       })
     );
-    newProduct.mainImageUrl = newProduct.productImages[0].imageUrl;
+    newProduct.mainImageUrl = await uploadServices.UploadImage(mainImage);
     const productServices = new ProductService();
     const res = await productServices.Create(newProduct);
     setloading(false);
@@ -785,6 +786,72 @@ export default function CreateProductView() {
           >
             Hình ảnh sản phẩm <span style={{ color: 'red' }}>*</span>
           </Typography>
+          <Box sx={{ padding: '10px', display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            {mainImage ? (
+              <InputFile
+                onClick={() => {
+                  setMainImage(null);
+                }}
+                file={
+                  mainImage ??
+                  'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg'
+                }
+                imageView
+                sx={{
+                  width: '336px',
+                  height: '336px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  border: '1px solid #919eabcc',
+                }}
+              />
+            ) : null}
+
+            {mainImage ? null : (
+              <Box
+                sx={{
+                  position: 'relative',
+                  width: '336px',
+                  height: '336px',
+                  borderRadius: '10px',
+                  border: '1px solid #919eabcc',
+                }}
+              >
+                <TextField
+                  type="file"
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    zIndex: 2,
+                    '& input': {
+                      width: '336px',
+                      height: '336px',
+                      padding: 0,
+                      opacity: 0,
+                      cursor: 'pointer',
+                    },
+                  }}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    if (event.target.files) {
+                      setMainImage(event.target.files[0]);
+                    }
+                  }}
+                />
+                <DriveFolderUploadIcon
+                  sx={{
+                    position: 'absolute',
+                    top: '41%',
+                    left: '41%',
+                    fontSize: '60px',
+                    zIndex: 1,
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
           <Box sx={{ padding: '10px', display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {images.map((image, index) => (
               <InputFile

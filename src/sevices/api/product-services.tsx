@@ -137,7 +137,8 @@ export default class ProductService {
         name: 'T-Shirt',
         nameEn: 'T-Shirt',
         description: 'A comfortable cotton t-shirt.',
-        mainImageUrl: 'https://example.com/images/tshirt.jpg',
+        mainImageUrl:
+          'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
         categoryId: '2',
         categoryName: 'Apparel',
         productVariants: [

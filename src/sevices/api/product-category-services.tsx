@@ -27,6 +27,18 @@ export default class ProductCategoryService {
           id: '4',
           name: 'Sản phẩm mùa đông',
         },
+        {
+          id: '5',
+          name: 'Sản phẩm mùa hè',
+        },
+        {
+          id: '6',
+          name: 'Sản phẩm mùa thu',
+        },
+        {
+          id: '7',
+          name: 'Sản phẩm mùa xuân',
+        },
       ],
       totalRecordsCount: 30,
     };

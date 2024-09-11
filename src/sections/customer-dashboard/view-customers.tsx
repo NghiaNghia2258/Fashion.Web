@@ -223,7 +223,7 @@ export default function CustomersView() {
   return (
     <Container maxWidth={settings.themeStretch ? false : 'xl'}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Danh sách sản phẩm</Typography>
+        <Typography variant="h4">Danh sách khách hàng</Typography>
 
         <Box
           sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}
@@ -252,12 +252,15 @@ export default function CustomersView() {
       >
         <TextField
           id="outlined-basic"
-          label="Nhập tên khách hàng"
+          label="Nhập tên/SDT khách hàng"
           variant="outlined"
           sx={{
             backgroundColor: '#fff',
             width: '300px',
+            height: '38px',
+            borderRadius: 1,
           }}
+          size="small"
           onChange={(event) => {
             // setOptionPagination({
             //   ...optionPagination,
@@ -266,23 +269,7 @@ export default function CustomersView() {
           }}
         />
 
-        <TextField
-          id="outlined-basic"
-          label="Số điện thoại"
-          variant="outlined"
-          sx={{
-            backgroundColor: '#fff',
-            width: '200px',
-          }}
-          onChange={(event) => {
-            // setOptionPagination({
-            //   ...optionPagination,
-            //   name: event.target.value,
-            // });
-          }}
-        />
-
-        <Button onClick={() => {}} variant="contained" color="success" sx={{}}>
+        <Button onClick={() => {}} variant="contained" color="success" sx={{ height: '38px' }}>
           Lọc
         </Button>
       </Box>
