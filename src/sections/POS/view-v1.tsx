@@ -171,9 +171,9 @@ export default function POSv1View() {
     });
   }, []);
   useEffect(() => {
-    const orderItemSevice = new OrderItemService();
+    const orderSevice = new OrderService();
     //setLoadingOrder(true);
-    orderItemSevice.GetByOrderId(orderSelected.id).then((res) => {
+    orderSevice.GetOrderItems(orderSelected.id).then((res) => {
       setItemsOfOrderSelected(res.data);
       //setLoadingOrder(false);
     });
@@ -749,7 +749,8 @@ export default function POSv1View() {
                 discountPercent: optionDiscount.discountPercent
                   ? optionDiscount.discountPercent
                   : orderSelected.discountPercent,
-                voucher: optionDiscount.voucher,
+                voucherId: optionDiscount.voucher.Id,
+                voucherCode: optionDiscount.voucher.Code,
               });
             }}
             variant="contained"
@@ -778,6 +779,11 @@ export default function POSv1View() {
       setOrders(res.data);
       setLoadingOrder(false);
     });
+    orderSelected.orderItems = itemsOfOrderSelected;
+    orderSelected.totalPrice = itemsOfOrderSelected.reduce(
+      (sum, item) => sum + (item.quantity ?? 0) * (item.unitPrice ?? 0),
+      0
+    );
     orderSevice.Update(orderSelected).then((res) => {
       if (res.isSucceeded) {
         setIsScreen1(true);

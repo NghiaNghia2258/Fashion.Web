@@ -5,8 +5,8 @@ import { VoucherDto } from './voucher-dto';
 
 export interface OrderDto {
   id?: string;
-  code?: string; // new column
-  name?: string; // new column
+  code?: string;
+  name?: string;
   note?: string;
   customerNote?: string;
   paymentStatus?: string;
@@ -14,10 +14,10 @@ export interface OrderDto {
   discountPercent?: number;
   discountValue?: number;
   customerId?: string;
-  customerName?: string; // new column
-  customerPhone?: string; // new column
+  customerName?: string;
+  customerPhone?: string;
   voucherId?: string;
-  voucherCode?: string; // new column
+  voucherCode?: string;
   recipientsInformationId?: string;
   totalPrice?: number;
   status?: number;
