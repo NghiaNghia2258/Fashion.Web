@@ -5,21 +5,21 @@ import { UserLoginDto } from './user-login-dto';
 
 export interface CustomerDto {
   id?: string;
-  code?: string; // new column
+  code?: string;
   name?: string;
   phone?: string;
   gender?: string;
   point?: number;
   userLoginId?: string;
   quarterlySpending?: number; // new column
-  debt?: number; // new column
+  debt?: number;
   isDeleted?: boolean;
   deletedAt?: Date;
   deletedBy?: string;
   deletedName?: string;
-  createdAt?: Date; // new column
-  createdBy?: string; // new column
-  createdName?: string; // new column
+  createdAt?: Date;
+  createdBy?: string;
+  createdName?: string;
   productRates?: ProductRateDto[];
   recipientsInformations?: RecipientsInformationDto[];
   orders?: OrderDto[];

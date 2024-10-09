@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import { useSettingsContext } from 'src/components/settings';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useRef, useEffect, useState } from 'react';
 import { OrderDto } from 'src/sevices/DTOs/order-dto';
 import { ProductDto } from 'src/sevices/DTOs/product-dto';
 import { ProductCategoryDto } from 'src/sevices/DTOs/product-category-dto';
@@ -13,8 +13,7 @@ import ProductService from 'src/sevices/api/product-services';
 import ProductCategoryService from 'src/sevices/api/product-category-services';
 import { OptionFilterProduct } from 'src/sevices/paramas/option-filter-product';
 import { OptionFilterOrder } from 'src/sevices/paramas/option-filter-order';
-import OrderItemService from 'src/sevices/api/order-item-services';
-import { Button, TablePagination, TextField } from '@mui/material';
+import { Button, TextField, TablePagination } from '@mui/material';
 import { InputFile } from 'src/components/file-thumbnail';
 
 import CircularProgress from '@mui/material/CircularProgress';
@@ -28,7 +27,6 @@ import BackspaceIcon from '@mui/icons-material/Backspace';
 import SendIcon from '@mui/icons-material/Send';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-import Autocomplete from '@mui/material/Autocomplete';
 import { CustomerDto } from 'src/sevices/DTOs/customer-dto';
 import CreateCustomerView from '../customer-dashboard/view-create-customer';
 import { DashboardContext } from 'src/layouts/dashboard';
@@ -38,7 +36,6 @@ import CustomerService from 'src/sevices/api/customer-service';
 // ----------------------------------------------------------------------
 
 export default function POSv1View() {
-  const settings = useSettingsContext();
   const toast = useContext(DashboardContext);
 
   const [isScreen1, setIsScreen1] = useState<boolean>(true);
@@ -172,20 +169,20 @@ export default function POSv1View() {
   }, []);
   useEffect(() => {
     const orderSevice = new OrderService();
-    //setLoadingOrder(true);
+    // setLoadingOrder(true);
     orderSevice.GetOrderItems(orderSelected.id).then((res) => {
       setItemsOfOrderSelected(res.data);
-      //setLoadingOrder(false);
+      // setLoadingOrder(false);
     });
   }, [orderSelected]);
   useEffect(() => {
-    const colors = Array.from(
+    const colors2 = Array.from(
       new Set(variantOfProductSelected.flatMap((variant) => variant.color))
     );
 
-    const sizes = Array.from(new Set(variantOfProductSelected.flatMap((variant) => variant.size)));
+    const sizes2 = Array.from(new Set(variantOfProductSelected.flatMap((variant) => variant.size)));
     setColors(
-      colors.map((color) => {
+      colors2.map((color) => {
         if (!productVariantSelected.color && !productVariantSelected.size) {
           return {
             color: color,
@@ -228,7 +225,7 @@ export default function POSv1View() {
       })
     );
     setSizes(
-      sizes.map((size) => {
+      sizes2.map((size) => {
         if (!productVariantSelected.size && !productVariantSelected.color) {
           return {
             size: size,
@@ -395,7 +392,7 @@ export default function POSv1View() {
                   quantity: parseInt(e.target.value, 10),
                 });
               } else {
-                e.target.value = undefined;
+                e.target.value = '';
                 setNewOrderItem({
                   ...newOrderItem,
                   quantity: undefined,
@@ -421,7 +418,7 @@ export default function POSv1View() {
                   discountValue: parseInt(e.target.value, 10),
                 });
               } else {
-                e.target.value = undefined;
+                e.target.value = '';
                 setNewOrderItem({
                   ...newOrderItem,
                   discountValue: undefined,
@@ -445,7 +442,7 @@ export default function POSv1View() {
                   discountPercent: parseInt(e.target.value, 10) / 100,
                 });
               } else {
-                e.target.value = undefined;
+                e.target.value = '';
                 setNewOrderItem({
                   ...newOrderItem,
                   discountPercent: undefined,
@@ -642,7 +639,7 @@ export default function POSv1View() {
                     discountValue: parseInt(e.target.value, 10),
                   });
                 } else {
-                  e.target.value = undefined;
+                  e.target.value = '';
                   setOptionDiscount({
                     ...optionDiscount,
                     discountValue: undefined,
@@ -670,7 +667,7 @@ export default function POSv1View() {
                     discountPercent: parseInt(e.target.value, 10) / 100,
                   });
                 } else {
-                  e.target.value = undefined;
+                  e.target.value = '';
                   setOptionDiscount({
                     ...optionDiscount,
                     discountPercent: undefined,
@@ -765,10 +762,6 @@ export default function POSv1View() {
     </Box>
   );
 
-  const handleFilterProductByCategory = async (
-    category: ProductCategoryDto | null
-  ): Promise<void> => {};
-  const handleFilterProductByWord = async (word: string | null): Promise<void> => {};
   const handleSaveOrderToDB = async (): Promise<void> => {
     setOrderSelected({});
     setItemsOfOrderSelected([]);
@@ -1073,361 +1066,363 @@ export default function POSv1View() {
       </Box>
     );
   }
-
-  return (
-    <Box key={2} sx={{ display: 'flex', gap: 1 }}>
-      <Box
-        sx={{
-          flex: 8,
-          display: 'flex',
-          border: '1px solid',
-          borderRadius: 1,
-          gap: 2,
-          height: '87vh',
-        }}
-      >
+  if (isScreen2) {
+    return (
+      <Box key={2} sx={{ display: 'flex', gap: 1 }}>
         <Box
           sx={{
-            padding: ' 0 5px',
-            paddingBottom: '5px',
-            borderRight: '1px solid',
-            flex: 2,
+            flex: 8,
+            display: 'flex',
+            border: '1px solid',
+            borderRadius: 1,
+            gap: 2,
             height: '87vh',
-            overflow: 'scroll',
-            scrollbarWidth: 'none',
           }}
         >
-          {renderListCategory}
-        </Box>
-        <Box sx={{ flex: 9, position: 'relative' }}>
-          <Box marginBottom={2} sx={{ display: 'flex', alignItems: 'end', gap: 1 }}>
-            <SearchIcon />
-            <TextField
-              variant="standard"
-              label="Nhập tên sản phẩm"
-              sx={{ width: '90%' }}
-              onChange={(event) => {
-                const searchTerm = event.target.value;
-                debouncedApiCall(searchTerm); // Gọi hàm debounce
-              }}
-            />
-          </Box>
           <Box
             sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1,
-              padding: '10px 0',
+              padding: ' 0 5px',
+              paddingBottom: '5px',
+              borderRight: '1px solid',
+              flex: 2,
+              height: '87vh',
+              overflow: 'scroll',
+              scrollbarWidth: 'none',
             }}
           >
-            {loadingProduct ? <CircularProgress sx={{ margin: '0 45%' }} /> : renderListProduct}
+            {renderListCategory}
           </Box>
-          <TablePagination
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-            }}
-            component="div"
-            rowsPerPageOptions={[5, 10, 15]}
-            rowsPerPage={optionFilter.pageSize}
-            page={optionFilter.pageIndex - 1}
-            onPageChange={(e, newPage) => {
-              setoptionFilter({
-                ...optionFilter,
-                pageIndex: newPage + 1,
-              });
-              const productService = new ProductService();
-              setLoadingProduct(true);
-              productService
-                .GetAll({
+          <Box sx={{ flex: 9, position: 'relative' }}>
+            <Box marginBottom={2} sx={{ display: 'flex', alignItems: 'end', gap: 1 }}>
+              <SearchIcon />
+              <TextField
+                variant="standard"
+                label="Nhập tên sản phẩm"
+                sx={{ width: '90%' }}
+                onChange={(event) => {
+                  const searchTerm = event.target.value;
+                  debouncedApiCall(searchTerm); // Gọi hàm debounce
+                }}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 1,
+                padding: '10px 0',
+              }}
+            >
+              {loadingProduct ? <CircularProgress sx={{ margin: '0 45%' }} /> : renderListProduct}
+            </Box>
+            <TablePagination
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+              }}
+              component="div"
+              rowsPerPageOptions={[5, 10, 15]}
+              rowsPerPage={optionFilter.pageSize}
+              page={optionFilter.pageIndex - 1}
+              onPageChange={(e, newPage) => {
+                setoptionFilter({
                   ...optionFilter,
                   pageIndex: newPage + 1,
-                })
-                .then((res) => {
-                  setProducts(res.data);
-                  setTotalRecordsCount(res.totalRecordsCount ?? 0);
-                })
-                .finally(() => setLoadingProduct(false));
-            }}
-            onRowsPerPageChange={(
-              event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-            ) => {
-              setoptionFilter({
-                ...optionFilter,
-                pageSize: parseInt(event.target.value, 10),
-                pageIndex: 1,
-              });
-              const productService = new ProductService();
-              setLoadingProduct(true);
-              productService
-                .GetAll({
+                });
+                const productService = new ProductService();
+                setLoadingProduct(true);
+                productService
+                  .GetAll({
+                    ...optionFilter,
+                    pageIndex: newPage + 1,
+                  })
+                  .then((res) => {
+                    setProducts(res.data);
+                    setTotalRecordsCount(res.totalRecordsCount ?? 0);
+                  })
+                  .finally(() => setLoadingProduct(false));
+              }}
+              onRowsPerPageChange={(
+                event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+              ) => {
+                setoptionFilter({
                   ...optionFilter,
                   pageSize: parseInt(event.target.value, 10),
                   pageIndex: 1,
-                })
-                .then((res) => {
-                  setProducts(res.data);
-                  setTotalRecordsCount(res.totalRecordsCount ?? 0);
-                })
-                .finally(() => setLoadingProduct(false));
-            }}
-            labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
-            labelRowsPerPage="Số sản phẩm/trang"
-            count={totalRecordsCount}
-          />
-        </Box>
-      </Box>
-      <Box
-        sx={{ flex: 5, border: '1px solid', borderRadius: 1, overflow: 'hidden', height: '87vh' }}
-      >
-        <Box
-          sx={{
-            height: '24%',
-            borderBottom: '1px solid',
-            padding: '10px',
-          }}
-        >
-          <Typography variant="h4" sx={{ textAlign: 'center' }}>
-            Chi tiết hóa đơn
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'end' }}>
-            <SearchIcon />
-            <Box sx={{ width: '90%', position: 'relative' }}>
-              <TextField
-                variant="standard"
-                placeholder="Nhập tên/SDT khách hàng"
-                sx={{ width: '100%' }}
-                size="small"
-                type="text"
-                onBlur={() => {
-                  setTimeout(() => {
-                    setIsOpenAutoComplate(false);
-                  }, 250);
-                }}
-                onFocus={() => {
-                  setIsOpenAutoComplate(true);
-                }}
-                onChange={(e) => {
-                  debouncedApiCallSearchCustomer(e.target.value);
-                }}
-              />
-              {isOpenAutoComplate ? (
-                <Box
-                  sx={{
-                    width: '100%',
-                    height: '200px',
-                    border: '1px solid',
-                    position: 'absolute',
-                    backgroundColor: '#fff',
-                    borderRadius: '4px',
-                    zIndex: 10,
-                    top: 33,
-                    overflow: 'scroll',
-                    scrollbarWidth: 'none',
-                  }}
-                >
-                  {customers.map((customer) => (
-                    <Box
-                      onClick={() => {
-                        setOrderSelected({
-                          ...orderSelected,
-                          customer: customer,
-                          customerName: customer.name,
-                          customerPhone: customer.phone,
-                          customerId: customer.id,
-                        });
-                      }}
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        padding: '10px 30px',
-                        cursor: 'pointer',
-                        borderBottom: '1px solid',
-
-                        '&:hover': {
-                          backgroundColor: '#e8e8e8',
-                        },
-                      }}
-                    >
-                      <Box>
-                        <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>
-                          {customer.name}
-                        </Typography>
-                        <Typography sx={{ fontSize: '13px', color: '#9c9b9b' }}>
-                          Mã :{customer.code}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography sx={{ fontSize: '13px', color: '#9c9b9b' }}>
-                          SDT :{customer.phone}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              ) : null}
-            </Box>
-            <PlaylistAddIcon
-              onClick={() => {
-                setIsOpenDialogCreateCustomer(true);
+                });
+                const productService = new ProductService();
+                setLoadingProduct(true);
+                productService
+                  .GetAll({
+                    ...optionFilter,
+                    pageSize: parseInt(event.target.value, 10),
+                    pageIndex: 1,
+                  })
+                  .then((res) => {
+                    setProducts(res.data);
+                    setTotalRecordsCount(res.totalRecordsCount ?? 0);
+                  })
+                  .finally(() => setLoadingProduct(false));
               }}
-              sx={{ fontSize: '28px', cursor: 'pointer' }}
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
+              labelRowsPerPage="Số sản phẩm/trang"
+              count={totalRecordsCount}
             />
           </Box>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            <Box
-              sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end', marginTop: '5px' }}
-            >
-              <Typography sx={{ fontSize: 13 }}>Khách hàng: </Typography>
-              <Typography sx={{ fontWeight: 700 }}>{orderSelected.customerName}</Typography>
-            </Box>
-            <Box
-              sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end', marginTop: '5px' }}
-            >
-              <Typography sx={{ fontSize: 13 }}>Người tạo</Typography>
-              <Typography sx={{ fontWeight: 700 }}>{orderSelected.createdName}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end' }}>
-              <Typography sx={{ fontSize: 13 }}>SDT: </Typography>
-              <Typography sx={{ fontWeight: 700 }}>{orderSelected.customerPhone}</Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end' }}>
-              <Typography sx={{ fontSize: 13 }}>Ngày tạo</Typography>
-              <Typography sx={{ fontWeight: 700 }}>
-                {orderSelected.createdAt?.toLocaleDateString()}
-              </Typography>
-            </Box>
-          </Box>
         </Box>
         <Box
-          sx={{
-            height: '55%',
-            borderBottom: '1px solid',
-            padding: '10px',
-          }}
+          sx={{ flex: 5, border: '1px solid', borderRadius: 1, overflow: 'hidden', height: '87vh' }}
         >
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              paddingBottom: '5px',
+              height: '24%',
               borderBottom: '1px solid',
+              padding: '10px',
             }}
           >
-            <Box sx={{ flex: 2 }}></Box>
-            <Box sx={{ flex: 6 }}>Tên sản phẩm</Box>
-            <Box sx={{ flex: 3 }}>Đơn giá</Box>
-            <Box sx={{ flex: 2, paddingLeft: 2 }}>SL</Box>
-            <Box sx={{ flex: 4 }}>Thành tiền</Box>
-            <Box sx={{ flex: 1 }}></Box>
-          </Box>
-          <Box sx={{ overflow: 'scroll', height: '90%', scrollbarWidth: 'none' }}>
-            {renderListOrderItem}
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            borderBottom: '1px solid',
-            height: '7%',
-          }}
-        >
-          <DiscountIcon
-            onClick={() => {
-              setIsOpenDialogDiscount(true);
-            }}
-            sx={{
-              padding: '5px',
-              fontSize: '46px',
-              color: '#fff',
-              backgroundColor: '#00b8d9',
-              height: '100%',
-              cursor: 'pointer',
-              marginRight: '2px',
-            }}
-          />
-          <EditNoteIcon
-            onClick={() => {
-              setIsOpenDialogWriteNote(true);
-            }}
-            sx={{
-              padding: '5px',
-              fontSize: '46px',
-              color: '#fff',
-              backgroundColor: '#00b8d9',
-              height: '100%',
-              cursor: 'pointer',
-              marginRight: '2px',
-            }}
-          />
-        </Box>
-        <Box sx={{ display: 'flex', height: '14%' }}>
-          <Button
-            sx={{ flex: 1, borderRadius: '0px' }}
-            onClick={() => {
-              setIsScreen1(true);
-              setIsScreen2(false);
-              setOrderSelected({});
-              setItemsOfOrderSelected([]);
-              setVariantOfProductSelected([]);
-              const orderSevice = new OrderService();
-              setLoadingOrder(true);
-              orderSevice.GetAll(new OptionFilterOrder()).then((res) => {
-                setOrders(res.data);
-                setLoadingOrder(false);
-              });
-            }}
-            variant="contained"
-          >
-            Thoát
-          </Button>
-          <Button
-            sx={{ flex: 1, borderRadius: '0px' }}
-            onClick={handleSaveOrderToDB}
-            variant="contained"
-          >
-            Lưu
-          </Button>
-          <Button sx={{ flex: 1, borderRadius: '0px' }} onClick={() => {}} variant="contained">
-            Tạm tính
-          </Button>
-          <Button
-            sx={{ flex: 1, borderRadius: '0px' }}
-            onClick={() => {
-              setOpen(true);
-            }}
-            variant="contained"
-          >
-            Thanh toán
-          </Button>
-        </Box>
-      </Box>
+            <Typography variant="h4" sx={{ textAlign: 'center' }}>
+              Chi tiết hóa đơn
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'end' }}>
+              <SearchIcon />
+              <Box sx={{ width: '90%', position: 'relative' }}>
+                <TextField
+                  variant="standard"
+                  placeholder="Nhập tên/SDT khách hàng"
+                  sx={{ width: '100%' }}
+                  size="small"
+                  type="text"
+                  onBlur={() => {
+                    setTimeout(() => {
+                      setIsOpenAutoComplate(false);
+                    }, 250);
+                  }}
+                  onFocus={() => {
+                    setIsOpenAutoComplate(true);
+                  }}
+                  onChange={(e) => {
+                    debouncedApiCallSearchCustomer(e.target.value);
+                  }}
+                />
+                {isOpenAutoComplate ? (
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: '200px',
+                      border: '1px solid',
+                      position: 'absolute',
+                      backgroundColor: '#fff',
+                      borderRadius: '4px',
+                      zIndex: 10,
+                      top: 33,
+                      overflow: 'scroll',
+                      scrollbarWidth: 'none',
+                    }}
+                  >
+                    {customers.map((customer) => (
+                      <Box
+                        onClick={() => {
+                          setOrderSelected({
+                            ...orderSelected,
+                            customer: customer,
+                            customerName: customer.name,
+                            customerPhone: customer.phone,
+                            customerId: customer.id,
+                          });
+                        }}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: '10px 30px',
+                          cursor: 'pointer',
+                          borderBottom: '1px solid',
 
-      {isOpenDialogCreateCustomer ? (
-        <CreateCustomerView
-          handleAgree={() => {
-            setIsOpenDialogCreateCustomer(false);
-          }}
-          handleDisAgree={() => {
-            setIsOpenDialogCreateCustomer(false);
-          }}
+                          '&:hover': {
+                            backgroundColor: '#e8e8e8',
+                          },
+                        }}
+                      >
+                        <Box>
+                          <Typography sx={{ fontSize: '16px', fontWeight: 600 }}>
+                            {customer.name}
+                          </Typography>
+                          <Typography sx={{ fontSize: '13px', color: '#9c9b9b' }}>
+                            Mã :{customer.code}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography sx={{ fontSize: '13px', color: '#9c9b9b' }}>
+                            SDT :{customer.phone}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : null}
+              </Box>
+              <PlaylistAddIcon
+                onClick={() => {
+                  setIsOpenDialogCreateCustomer(true);
+                }}
+                sx={{ fontSize: '28px', cursor: 'pointer' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Box
+                sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end', marginTop: '5px' }}
+              >
+                <Typography sx={{ fontSize: 13 }}>Khách hàng: </Typography>
+                <Typography sx={{ fontWeight: 700 }}>{orderSelected.customerName}</Typography>
+              </Box>
+              <Box
+                sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end', marginTop: '5px' }}
+              >
+                <Typography sx={{ fontSize: 13 }}>Người tạo</Typography>
+                <Typography sx={{ fontWeight: 700 }}>{orderSelected.createdName}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end' }}>
+                <Typography sx={{ fontSize: 13 }}>SDT: </Typography>
+                <Typography sx={{ fontWeight: 700 }}>{orderSelected.customerPhone}</Typography>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 1, width: '45%', alignItems: 'end' }}>
+                <Typography sx={{ fontSize: 13 }}>Ngày tạo</Typography>
+                <Typography sx={{ fontWeight: 700 }}>
+                  {orderSelected.createdAt?.toLocaleDateString()}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              height: '55%',
+              borderBottom: '1px solid',
+              padding: '10px',
+            }}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                paddingBottom: '5px',
+                borderBottom: '1px solid',
+              }}
+            >
+              <Box sx={{ flex: 2 }}></Box>
+              <Box sx={{ flex: 6 }}>Tên sản phẩm</Box>
+              <Box sx={{ flex: 3 }}>Đơn giá</Box>
+              <Box sx={{ flex: 2, paddingLeft: 2 }}>SL</Box>
+              <Box sx={{ flex: 4 }}>Thành tiền</Box>
+              <Box sx={{ flex: 1 }}></Box>
+            </Box>
+            <Box sx={{ overflow: 'scroll', height: '90%', scrollbarWidth: 'none' }}>
+              {renderListOrderItem}
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              borderBottom: '1px solid',
+              height: '7%',
+            }}
+          >
+            <DiscountIcon
+              onClick={() => {
+                setIsOpenDialogDiscount(true);
+              }}
+              sx={{
+                padding: '5px',
+                fontSize: '46px',
+                color: '#fff',
+                backgroundColor: '#00b8d9',
+                height: '100%',
+                cursor: 'pointer',
+                marginRight: '2px',
+              }}
+            />
+            <EditNoteIcon
+              onClick={() => {
+                setIsOpenDialogWriteNote(true);
+              }}
+              sx={{
+                padding: '5px',
+                fontSize: '46px',
+                color: '#fff',
+                backgroundColor: '#00b8d9',
+                height: '100%',
+                cursor: 'pointer',
+                marginRight: '2px',
+              }}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', height: '14%' }}>
+            <Button
+              sx={{ flex: 1, borderRadius: '0px' }}
+              onClick={() => {
+                setIsScreen1(true);
+                setIsScreen2(false);
+                setOrderSelected({});
+                setItemsOfOrderSelected([]);
+                setVariantOfProductSelected([]);
+                const orderSevice = new OrderService();
+                setLoadingOrder(true);
+                orderSevice.GetAll(new OptionFilterOrder()).then((res) => {
+                  setOrders(res.data);
+                  setLoadingOrder(false);
+                });
+              }}
+              variant="contained"
+            >
+              Thoát
+            </Button>
+            <Button
+              sx={{ flex: 1, borderRadius: '0px' }}
+              onClick={handleSaveOrderToDB}
+              variant="contained"
+            >
+              Lưu
+            </Button>
+            <Button sx={{ flex: 1, borderRadius: '0px' }} onClick={() => {}} variant="contained">
+              Tạm tính
+            </Button>
+            <Button
+              sx={{ flex: 1, borderRadius: '0px' }}
+              onClick={() => {
+                setOpen(true);
+              }}
+              variant="contained"
+            >
+              Thanh toán
+            </Button>
+          </Box>
+        </Box>
+
+        {isOpenDialogCreateCustomer ? (
+          <CreateCustomerView
+            handleAgree={() => {
+              setIsOpenDialogCreateCustomer(false);
+            }}
+            handleDisAgree={() => {
+              setIsOpenDialogCreateCustomer(false);
+            }}
+          />
+        ) : null}
+
+        {isOpenDialogProductVariant ? dialogProductVariant : null}
+        {isOpenDialogWriteNote ? dialogWirteNote : null}
+        {isOpenDialogDiscount ? dialogDiscount : null}
+
+        <AlertDialog
+          isOpen={open}
+          labelAgree="Xác nhận"
+          labelDisagree="Hủy"
+          handleAgree={handleAgree}
+          handleDisagree={handleDisagree}
+          description=""
+          title="Xác nhận thanh toán"
         />
-      ) : null}
-
-      {isOpenDialogProductVariant ? dialogProductVariant : null}
-      {isOpenDialogWriteNote ? dialogWirteNote : null}
-      {isOpenDialogDiscount ? dialogDiscount : null}
-
-      <AlertDialog
-        isOpen={open}
-        labelAgree="Xác nhận"
-        labelDisagree="Hủy"
-        handleAgree={handleAgree}
-        handleDisagree={handleDisagree}
-        description=""
-        title="Xác nhận thanh toán"
-      />
-    </Box>
-  );
+      </Box>
+    );
+  }
+  return <></>;
 }

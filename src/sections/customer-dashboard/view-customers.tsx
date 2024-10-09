@@ -4,7 +4,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { useSettingsContext } from 'src/components/settings';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, TextField } from '@mui/material';
 
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
@@ -15,15 +15,18 @@ import AlertDialog from 'src/components/dialog/alert-dialog';
 import { CustomerDto } from 'src/sevices/DTOs/customer-dto';
 
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import CreateCustomerView from './view-create-customer';
 import CustomerService from 'src/sevices/api/customer-service';
 import { OptionFilterCustomer } from 'src/sevices/paramas/option-fliter-customer';
+
+import CircularProgress from '@mui/material/CircularProgress';
+
+import CreateCustomerView from './view-create-customer';
 
 // ----------------------------------------------------------------------
 
 export default function CustomersView() {
   const settings = useSettingsContext();
-  const [optionFilter, setoptionFilter] = useState<OptionFilterCustomer>(
+  const [optionFilter, setOptionFilter] = useState<OptionFilterCustomer>(
     new OptionFilterCustomer()
   );
   const [open, setOpen] = useState<boolean>(false);
@@ -104,7 +107,7 @@ export default function CustomersView() {
           Bạc
         </Box>
       );
-    } else if (paramas.row.quarterlySpending >= 500000) {
+    } else {
       return (
         <Box
           sx={{
@@ -121,17 +124,6 @@ export default function CustomersView() {
         </Box>
       );
     }
-    return (
-      <Box
-        sx={{
-          border: '1px solid',
-          height: '80%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      ></Box>
-    );
   };
   const columns: GridColDef[] = [
     {
@@ -165,7 +157,9 @@ export default function CustomersView() {
       headerName: 'Chi tiêu/90 ngày',
       width: 140,
       valueGetter: (value: number) => {
-        return `${value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`;
+        return `${
+          value ? value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : ''
+        }`;
       },
     },
     {
@@ -173,7 +167,9 @@ export default function CustomersView() {
       headerName: 'Công nợ',
       width: 110,
       valueGetter: (value: number) => {
-        return `${value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`;
+        return `${
+          value ? value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) : ''
+        }`;
       },
     },
     {
@@ -208,16 +204,15 @@ export default function CustomersView() {
       ),
     },
   ];
-
+  const handleFilter = async (): Promise<void> => {
+    setLoading(true);
+    const customerService = new CustomerService();
+    const res = await customerService.GetAll(optionFilter);
+    setcustomers(res.data);
+    setLoading(false);
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const customerService = new CustomerService();
-      const res = await customerService.GetAll(optionFilter);
-      setcustomers(res.data);
-      setLoading(false);
-    };
-    fetchData();
+    handleFilter();
   }, []);
 
   return (
@@ -262,14 +257,21 @@ export default function CustomersView() {
           }}
           size="small"
           onChange={(event) => {
-            // setOptionPagination({
-            //   ...optionPagination,
-            //   name: event.target.value,
-            // });
+            setOptionFilter({
+              ...optionFilter,
+              nameOrPhone: event.target.value,
+            });
           }}
         />
 
-        <Button onClick={() => {}} variant="contained" color="success" sx={{ height: '38px' }}>
+        <Button
+          onClick={() => {
+            handleFilter();
+          }}
+          variant="contained"
+          color="success"
+          sx={{ height: '38px' }}
+        >
           Lọc
         </Button>
       </Box>
@@ -285,27 +287,32 @@ export default function CustomersView() {
           border: (theme) => `dashed 1px ${theme.palette.divider}`,
         }}
       >
-        <DataGrid
-          sx={{
-            backgroundColor: '#fff',
-            '& .MuiDataGrid-cell': {
-              padding: '10px',
-              display: 'flex',
-              alignItems: 'center',
-            },
-          }}
-          rows={customers}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 10,
+        {loading ? (
+          <CircularProgress sx={{ margin: '0 45%' }} />
+        ) : (
+          <DataGrid
+            sx={{
+              backgroundColor: '#fff',
+              '& .MuiDataGrid-cell': {
+                padding: '10px',
+                display: 'flex',
+                alignItems: 'center',
               },
-            },
-          }}
-          pageSizeOptions={[5, 10, 15]}
-          disableRowSelectionOnClick
-        />
+            }}
+            rows={customers}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 10,
+                },
+                rowCount: 100,
+              },
+            }}
+            pageSizeOptions={[5, 10, 15]}
+            disableRowSelectionOnClick
+          />
+        )}
       </Box>
       <AlertDialog
         isOpen={open}

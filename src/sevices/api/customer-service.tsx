@@ -1,72 +1,15 @@
 import { CustomerDto } from '../DTOs/customer-dto';
 import { OptionFilterCustomer } from '../paramas/option-fliter-customer';
 import { ApiResult } from './api-result';
+import { URL } from '../constURL/constURL';
+
+import * as axios from '../axios-instance/axios-host1';
 
 export default class CustomerService {
   async GetAll(option: OptionFilterCustomer): Promise<ApiResult<CustomerDto[]>> {
-    // TODO: Implement logic to fetch all customers from API or database
-    console.log({ option });
-    const response = {
-      isSucceeded: true,
-      message: '',
-      data: [
-        {
-          id: '1',
-          code: 'KH001',
-          name: 'Customer1',
-          phone: '0342534443',
-          gender: 'Nam',
-          point: 100,
-          debt: 100000,
-          quarterlySpending: 1242000,
-          createdName: 'Ngô Quang Nghĩa',
-        },
-        {
-          id: '2',
-          code: 'KH002',
-          name: 'Customer2',
-          phone: '0342534443',
-          gender: 'Nữ',
-          debt: 100000,
-          quarterlySpending: 1242000,
-          point: 200,
-          createdName: 'Ngô Quang Nghĩa',
-        },
-        {
-          id: '3',
-          code: 'KH003',
-          name: 'Customer3',
-          phone: '0342534443',
-          gender: 'Nam',
-          debt: 100000,
-          quarterlySpending: 12420000,
-          point: 300,
-          createdName: 'Ngô Quang Nghĩa',
-        },
-        {
-          id: '4',
-          code: 'KH004',
-          name: 'Customer4',
-          phone: '0342534443',
-          gender: 'Nam',
-          debt: 100000,
-          quarterlySpending: 1242000,
-          point: 400,
-          createdName: 'Ngô Quang Ngh��a',
-        },
-        {
-          id: '5',
-          code: 'KH005',
-          name: 'Customer5',
-          phone: '0342534443',
-          gender: 'Nam',
-          debt: 100000,
-          quarterlySpending: 1242000,
-          point: 500,
-          createdName: 'Ngô Quang Ngh��a',
-        },
-      ],
-    };
+    const response = await axios.get(URL.CUSTOMER.GETALL, {
+      params: option,
+    });
     if (response.isSucceeded) {
       return {
         isSucceeded: true,

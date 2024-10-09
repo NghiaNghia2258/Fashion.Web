@@ -197,11 +197,13 @@ export default class ProductService {
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
+        data: true,
       };
     }
     return {
       isSucceeded: false,
       message: response.message,
+      data: false,
     };
   }
   async Update(product: ProductDto): Promise<ApiResult<boolean>> {
@@ -213,10 +215,12 @@ export default class ProductService {
     };
     if (response.isSucceeded) {
       return {
+        data: true,
         isSucceeded: true,
       };
     }
     return {
+      data: false,
       isSucceeded: false,
       message: response.message,
     };
@@ -229,10 +233,12 @@ export default class ProductService {
     };
     if (response.isSucceeded) {
       return {
+        data: true,
         isSucceeded: true,
       };
     }
     return {
+      data: false,
       isSucceeded: false,
       message: response.message,
     };
