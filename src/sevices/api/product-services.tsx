@@ -9,8 +9,6 @@ function delay(ms: number): Promise<void> {
 
 export default class ProductService {
   async GetAll(options: OptionFilterProduct): Promise<ApiResult<ProductDto[]>> {
-    // const response = await axios.post('/products', { params: options });
-    await delay(300);
     const response = {
       isSucceeded: true,
       message: '',

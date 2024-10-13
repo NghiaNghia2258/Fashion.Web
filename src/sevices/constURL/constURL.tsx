@@ -37,4 +37,17 @@ export const URL = {
     DELETE: 'order',
     PAYMENT: 'order/payment',
   },
+  UPLOAD: {
+    UPLOAD_IMAGE: 'upload/upload-images',
+    UPLOAD_FILE: 'upload/file',
+    UPLOAD_VIDEO: 'upload/upload-videos',
+    UPLOAD_AUDIO: 'upload/audio',
+    UPLOAD_PDF: 'upload/pdf',
+    UPLOAD_EXCEL: 'upload/excel',
+    UPLOAD_CSV: 'upload/csv',
+    UPLOAD_ZIP: 'upload/zip',
+    UPLOAD_MP4: 'upload/mp4',
+    GET_IMAGE: 'upload/images',
+    GET_VIDEO: 'upload/videos',
+  },
 };
