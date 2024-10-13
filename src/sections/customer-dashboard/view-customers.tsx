@@ -4,7 +4,7 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
 import { useSettingsContext } from 'src/components/settings';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Button, TextField } from '@mui/material';
 
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
@@ -21,15 +21,19 @@ import { OptionFilterCustomer } from 'src/sevices/paramas/option-fliter-customer
 import CircularProgress from '@mui/material/CircularProgress';
 
 import CreateCustomerView from './view-create-customer';
+import { DashboardContext } from 'src/layouts/dashboard';
 
 // ----------------------------------------------------------------------
 
 export default function CustomersView() {
   const settings = useSettingsContext();
+  const toast = useContext(DashboardContext);
+
   const [optionFilter, setOptionFilter] = useState<OptionFilterCustomer>(
     new OptionFilterCustomer()
   );
   const [open, setOpen] = useState<boolean>(false);
+  const [customerIdDelete, setCustomerIdDelete] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [customerEdit, setCustomerEdit] = useState<CustomerDto>({});
 
@@ -38,7 +42,25 @@ export default function CustomersView() {
     setOpen(false);
   };
 
-  const handleAgree = () => {
+  const handleAgree = async () => {
+    const customerService = new CustomerService();
+    const res = await customerService.Delete(customerIdDelete);
+    if (res.isSucceeded) {
+      toast?.ShowToast({
+        severity: 'success',
+        description: 'Xóa khách hàng thành công',
+        autoHideDuration: 3000,
+        title: 'Xóa thành công',
+      });
+      await handleFilter();
+    } else {
+      toast?.ShowToast({
+        severity: 'error',
+        description: res.message,
+        autoHideDuration: 3000,
+        title: 'Thất bại',
+      });
+    }
     setOpen(false);
   };
   const [customers, setcustomers] = useState<CustomerDto[]>([]);
@@ -197,6 +219,7 @@ export default function CustomersView() {
           />
           <DeleteIcon
             onClick={() => {
+              setCustomerIdDelete(gridRenderCellParams.row.id);
               setOpen(true);
             }}
           />
@@ -329,6 +352,7 @@ export default function CustomersView() {
           handleAgree={() => {
             setIsOpenDialogCreateCustomer(false);
             setCustomerEdit({});
+            handleFilter();
           }}
           handleDisAgree={() => {
             setIsOpenDialogCreateCustomer(false);

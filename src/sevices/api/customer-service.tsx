@@ -7,7 +7,7 @@ import * as axios from '../axios-instance/axios-host1';
 
 export default class CustomerService {
   async GetAll(option: OptionFilterCustomer): Promise<ApiResult<CustomerDto[]>> {
-    const response = await axios.get(URL.CUSTOMER.GETALL, {
+    const response = await axios.GET(URL.CUSTOMER.GETALL, {
       params: option,
     });
     if (response.isSucceeded) {
@@ -23,22 +23,7 @@ export default class CustomerService {
     };
   }
   async GetById(id: string): Promise<ApiResult<CustomerDto>> {
-    // TODO: Implement logic to fetch customer by ID from API or database
-    const response = {
-      isSucceeded: true,
-      message: '',
-      data: {
-        id: '1',
-        code: 'KH001',
-        name: 'Customer1',
-        phone: '0342534443',
-        gender: 'male',
-        point: 100,
-        debt: 100000,
-        quarterlySpending: 1242000,
-        createdName: 'Ngô Quang Ngh��a',
-      },
-    };
+    const response = await axios.GET(`${URL.CUSTOMER.GETONE}/${id}`);
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
@@ -52,11 +37,7 @@ export default class CustomerService {
     };
   }
   async Create(customer: CustomerDto): Promise<ApiResult<boolean>> {
-    // TODO: Implement logic to create a new customer in API or database
-    const response = {
-      isSucceeded: false,
-      message: 'Có lỗi xảy ra',
-    };
+    const response = await axios.POST(URL.CUSTOMER.CREATE, customer);
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
@@ -70,12 +51,8 @@ export default class CustomerService {
     };
   }
   async Update(customer: CustomerDto): Promise<ApiResult<boolean>> {
-    // TODO: Implement logic to update a customer in API or database
-    console.log(customer);
-    const response = {
-      isSucceeded: true,
-      message: '',
-    };
+    const response = await axios.PUT(URL.CUSTOMER.UPDATE, customer);
+
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
@@ -89,10 +66,8 @@ export default class CustomerService {
     };
   }
   async Delete(id: string): Promise<ApiResult<boolean>> {
-    const response = {
-      isSucceeded: true,
-      message: '',
-    };
+    const response = await axios.DELETE(`${URL.CUSTOMER.DELETE}/${id}`);
+
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
