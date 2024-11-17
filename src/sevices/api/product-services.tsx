@@ -2,6 +2,9 @@ import { ProductDto } from '../DTOs/product-dto';
 import { ProductVariantDto } from '../DTOs/product-variant-dto';
 import { OptionFilterProduct } from '../paramas/option-filter-product';
 import { ApiResult } from './api-result';
+import { URL } from '../constURL/constURL';
+
+import * as axios from '../axios-instance/axios-host1';
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -9,108 +12,9 @@ function delay(ms: number): Promise<void> {
 
 export default class ProductService {
   async GetAll(options: OptionFilterProduct): Promise<ApiResult<ProductDto[]>> {
-    const response = {
-      isSucceeded: true,
-      message: '',
-      totalRecordsCount: 30,
-      data: [
-        {
-          id: '1',
-          name: 'T-Shirt',
-          nameEn: 'T-Shirt',
-          description: 'A comfortable cotton t-shirt.',
-          mainImageUrl: 'https://example.com/images/tshirt.jpg',
-          categoryId: '10',
-          categoryName: 'Apparel',
-          productVariants: [
-            {
-              id: '101',
-              size: 'M',
-              color: 'Red',
-              price: 199999,
-              imageUrl: 'https://example.com/images/tshirt-red-m.jpg',
-              inventory: 20,
-            },
-            {
-              id: '102',
-              size: 'L',
-              color: 'Blue',
-              price: 229999,
-              imageUrl: 'https://example.com/images/tshirt-blue-l.jpg',
-              inventory: 30,
-            },
-          ],
-        },
-        {
-          id: '2',
-          name: 'Jeans',
-          nameEn: 'Jeans',
-          description: 'Stylish blue jeans.',
-          mainImageUrl: 'https://example.com/images/jeans.jpg',
-          categoryId: '10',
-          categoryName: 'Apparel',
-          productVariants: [
-            {
-              id: '201',
-              size: '32',
-              color: 'Dark Blue',
-              price: 499999,
-              imageUrl: 'https://example.com/images/jeans-darkblue-32.jpg',
-              inventory: 40,
-            },
-          ],
-        },
-        {
-          id: '3',
-          name: 'Shoes',
-          nameEn: 'Shoes',
-          description: 'Comfortable sneakers.',
-          mainImageUrl: 'https://example.com/images/shoes.jpg',
-          categoryId: '11',
-          categoryName: 'Footwear',
-          productVariants: [
-            {
-              id: '301',
-              size: '10',
-              color: 'Black',
-              price: 399999,
-              imageUrl: 'https://example.com/images/shoes-black-10.jpg',
-              inventory: 0,
-            },
-          ],
-        },
-        {
-          id: '4',
-          name: 'Accessories',
-          nameEn: 'Accessories',
-          description: 'Handmade accessories.',
-          mainImageUrl: 'https://example.com/images/accessories.jpg',
-          categoryId: '12',
-          categoryName: 'Accessories',
-          productVariants: [],
-        },
-        {
-          id: '5',
-          name: 'Electronics',
-          nameEn: 'Electronics',
-          description: 'High-quality electronics.',
-          mainImageUrl: 'https://example.com/images/electronics.jpg',
-          categoryId: '13',
-          categoryName: 'Electronics',
-          productVariants: [
-            {
-              id: '501',
-              size: '10',
-              color: 'Black',
-              price: 299999,
-              imageUrl:
-                'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
-              inventory: 50,
-            },
-          ],
-        },
-      ],
-    };
+    const response = await axios.GET(URL.PRODUCT.GETALL, {
+      params: options,
+    });
     if (response.isSucceeded) {
       return {
         isSucceeded: true,

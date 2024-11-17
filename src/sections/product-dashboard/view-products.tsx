@@ -339,8 +339,16 @@ export default function ProductsView() {
                     <Box
                       className="cell"
                       sx={{ width: 10, cursor: 'pointer' }}
-                      onClick={() => {
+                      onClick={async () => {
+                        console.log(product);
+                        if (!product.productVariants) {
+                           let productService = new ProductService();
+                           let res = await productService.GetById(product.id ?? '');
+			   //console.log(res);
+                           product = {...res.data};
+                        }
                         product.isActive = !product.isActive;
+			console.log(products);
                         setProducts([...products]);
                       }}
                     >
@@ -379,11 +387,7 @@ export default function ProductsView() {
                     <Box className="cell" sx={{ flex: 3 }}>
                       <Box
                         sx={{
-                          ...((product.productVariants ?? []).reduce(
-                            (accumulator, currentValue) =>
-                              accumulator + (currentValue.inventory ?? 0),
-                            0
-                          ) === 0
+                          ...(product.totalInventory === 0
                             ? { border: '3px solid #f44336', color: '#f44336' }
                             : { border: '3px solid #4caf50', color: '#4caf50' }),
                           fontSize: '13px',
@@ -392,13 +396,7 @@ export default function ProductsView() {
                           borderRadius: '5px',
                         }}
                       >
-                        {(product.productVariants ?? []).reduce(
-                          (accumulator, currentValue) =>
-                            accumulator + (currentValue.inventory ?? 0),
-                          0
-                        ) === 0
-                          ? 'Hết hàng'
-                          : 'Còn hàng'}
+                        {product.totalInventory === 0 ? 'Hết hàng' : 'Còn hàng'}
                       </Box>
                     </Box>
                     <Box className="cell" sx={{ flex: 3 }}>

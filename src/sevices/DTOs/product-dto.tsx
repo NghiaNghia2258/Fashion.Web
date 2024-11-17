@@ -9,6 +9,7 @@ export interface ProductDto {
   nameEn?: string;
   description?: string;
   mainImageUrl?: string;
+  totalInventory?: number;
   categoryId?: string;
   categoryName?: string;
   createdAt?: Date;
