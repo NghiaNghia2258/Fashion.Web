@@ -75,10 +75,7 @@ export default class ProductService {
     };
   }
   async Delete(id: string): Promise<ApiResult<boolean>> {
-    const response = {
-      isSucceeded: true,
-      message: 'Sản phẩm không tồn tại',
-    };
+    const response = await axios.DELETE(`${URL.PRODUCT.DELETE}/${id}`);
     if (response.isSucceeded) {
       return {
         data: true,
@@ -92,9 +89,6 @@ export default class ProductService {
     };
   }
   async GetVariants(productId: string | undefined): Promise<ApiResult<ProductVariantDto[]>> {
-    console.log(productId);
-    await delay(1000);
-    // Implement logic to fetch product variants from API or database
     return {
       isSucceeded: true,
       message: '',
