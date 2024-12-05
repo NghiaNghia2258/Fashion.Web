@@ -31,52 +31,9 @@ export default class ProductService {
   }
 
   async GetById(id: string): Promise<ApiResult<ProductDto>> {
-    await delay(2000);
-    const response = {
-      isSucceeded: true,
-      message: '',
-      data: {
-        id: '1',
-        name: 'T-Shirt',
-        nameEn: 'T-Shirt',
-        description: 'A comfortable cotton t-shirt.',
-        mainImageUrl:
-          'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
-        categoryId: '2',
-        categoryName: 'Apparel',
-        productVariants: [
-          {
-            id: '101',
-            size: 'M',
-            color: 'Red',
-            price: 199999,
-            imageUrl:
-              'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
-            inventory: 50,
-          },
-          {
-            id: '102',
-            size: 'L',
-            color: 'Blue',
-            price: 229999,
-            imageUrl: undefined,
-            inventory: 30,
-          },
-        ],
-        productImages: [
-          {
-            id: '103',
-            imageUrl:
-              'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
-          },
-          {
-            id: '104',
-            imageUrl:
-              'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg',
-          },
-        ],
-      },
-    };
+    const response = await axios.GET(URL.PRODUCT.GETONE, {
+      params: id,
+    });
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
@@ -90,12 +47,7 @@ export default class ProductService {
     };
   }
   async Create(product: ProductDto): Promise<ApiResult<boolean>> {
-    console.log(product);
-    await delay(2000);
-    const response = {
-      isSucceeded: false,
-      message: 'Tên không được dài quá 6 ký tự',
-    };
+    const response = await axios.POST(URL.PRODUCT.CREATE, product);
     if (response.isSucceeded) {
       return {
         isSucceeded: true,
@@ -109,12 +61,7 @@ export default class ProductService {
     };
   }
   async Update(product: ProductDto): Promise<ApiResult<boolean>> {
-    console.log(product);
-    await delay(2000);
-    const response = {
-      isSucceeded: true,
-      message: 'Sản phẩm không tồn tại',
-    };
+    const response = await axios.PUT(URL.PRODUCT.UPDATE, product);
     if (response.isSucceeded) {
       return {
         data: true,
@@ -128,7 +75,6 @@ export default class ProductService {
     };
   }
   async Delete(id: string): Promise<ApiResult<boolean>> {
-    await delay(500);
     const response = {
       isSucceeded: true,
       message: 'Sản phẩm không tồn tại',
