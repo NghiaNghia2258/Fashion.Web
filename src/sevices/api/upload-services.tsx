@@ -8,10 +8,20 @@ export default class UploadService {
     }
     let formData = new FormData();
     formData.append('file', fileImage);
-    // let res = await axios.POST(URL.UPLOAD.UPLOAD_IMAGE, formData);
-    // if (res.isSucceeded) {
-    //   return res.data;
-    // }
+
+    try {
+      let res = await axios.POST(URL.UPLOAD.UPLOAD_IMAGE, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (res.isSucceeded) {
+        console.log(res.data);
+        return res.data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
     return 'no-image.png';
   }
 }

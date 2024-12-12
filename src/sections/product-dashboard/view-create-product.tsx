@@ -71,16 +71,16 @@ export default function CreateProductView() {
     const uploadServices = new UploadService();
     newProduct.productVariants = await Promise.all(
       details.map(async (detail) => {
-        const urlImaage = await uploadServices.UploadImage(detail.fileImage);
-        return { ...detail, imageUrl: urlImaage, fileImage: undefined };
+        const urlImage = await uploadServices.UploadImage(detail.fileImage);
+        return { ...detail, imageUrl: urlImage, fileImage: undefined };
       })
     );
 
     newProduct.productImages = await Promise.all(
       images.map(async (img) => {
-        const urlImaage = await uploadServices.UploadImage(img);
+        const urlImage = await uploadServices.UploadImage(img);
         return {
-          imageUrl: urlImaage,
+          imageUrl: urlImage,
         };
       })
     );

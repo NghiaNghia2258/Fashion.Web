@@ -38,9 +38,9 @@ export const URL = {
     PAYMENT: 'order/payment',
   },
   UPLOAD: {
-    UPLOAD_IMAGE: 'upload/upload-images',
+    UPLOAD_IMAGE: 'upload/upload-image',
     UPLOAD_FILE: 'upload/file',
-    UPLOAD_VIDEO: 'upload/upload-videos',
+    UPLOAD_VIDEO: 'upload/upload-video',
     UPLOAD_AUDIO: 'upload/audio',
     UPLOAD_PDF: 'upload/pdf',
     UPLOAD_EXCEL: 'upload/excel',

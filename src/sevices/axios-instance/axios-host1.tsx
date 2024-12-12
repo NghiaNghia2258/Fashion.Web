@@ -25,9 +25,9 @@ export const GET = async (path: string, options?: any): Promise<any> => {
   return res.data;
 };
 
-export const POST = async (path: string, data?: any): Promise<any> => {
+export const POST = async (path: string, data?: any, headers?: any): Promise<any> => {
   try {
-    const res = await axiosInstance.post(path, data);
+    const res = await axiosInstance.post(path, data, headers);
     return res.data;
   } catch (error) {
     return {

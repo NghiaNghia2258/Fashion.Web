@@ -24,4 +24,5 @@ export interface ProductVariantDto {
   fileImage?: File | null;
   isDisabled?: boolean;
   isActivate?: boolean;
+  isEdited?: boolean;
 }

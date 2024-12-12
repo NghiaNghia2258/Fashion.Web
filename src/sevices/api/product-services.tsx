@@ -31,9 +31,7 @@ export default class ProductService {
   }
 
   async GetById(id: string): Promise<ApiResult<ProductDto>> {
-    const response = await axios.GET(URL.PRODUCT.GETONE, {
-      params: id,
-    });
+    const response = await axios.GET(`${URL.PRODUCT.GETONE}/${id}`);
     if (response.isSucceeded) {
       return {
         isSucceeded: true,

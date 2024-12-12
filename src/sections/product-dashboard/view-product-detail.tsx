@@ -143,7 +143,6 @@ export default function ProductDetailView() {
       for (let j = 0; j < sizes.length; j += 1) {
         id += 1;
         newDetails.push({
-          id: id.toLocaleString(),
           size: sizes[j],
           color: '',
           price: 0,
@@ -154,7 +153,6 @@ export default function ProductDetailView() {
       for (let j = 0; j < colors.length; j += 1) {
         id += 1;
         newDetails.push({
-          id: id.toLocaleString(),
           size: '',
           color: colors[j],
           price: 0,
@@ -166,7 +164,6 @@ export default function ProductDetailView() {
         for (let j = 0; j < colors.length; j += 1) {
           id += 1;
           newDetails.push({
-            id: id.toLocaleString(),
             size: sizes[i],
             color: colors[j],
             price: 0,
@@ -551,7 +548,8 @@ export default function ProductDetailView() {
                                 })
                               );
                             }}
-                            file={detail.imageUrl ?? ''}
+                            //
+                            file={`http://localhost:5190/api/upload/images/${detail.imageUrl}`}
                             imageView
                           />
                         ) : detail.fileImage ? (
@@ -562,6 +560,7 @@ export default function ProductDetailView() {
                                   if (obj.id === detail.id) {
                                     return {
                                       ...detail,
+                                      isEdited: true,
                                       fileImage: null,
                                     };
                                   } else {
@@ -614,6 +613,7 @@ export default function ProductDetailView() {
                                       if (obj.id === detail.id) {
                                         return {
                                           ...detail,
+                                          isEdited: true,
                                           fileImage: (event.target.files ?? [])[0],
                                         };
                                       } else {
@@ -765,7 +765,6 @@ export default function ProductDetailView() {
                   <Box
                     onClick={() => {
                       const newDetail = {
-                        id: (details.length + 1).toLocaleString(),
                         size: '',
                         color: '',
                         price: 0,
@@ -821,8 +820,6 @@ export default function ProductDetailView() {
                   });
                 }}
                 file={
-                  mainImage ??
-                  productGetById.mainImageUrl ??
                   'http://103.153.69.217:5055/api/files/images/8b79877d-00b3-46d5-aaf0-5af6db65f70d.jpeg'
                 }
                 imageView
@@ -908,7 +905,7 @@ export default function ProductDetailView() {
                       );
                       setProductImages(updatedImages);
                     }}
-                    file={image.imageUrl ?? ''}
+                    file={`http://localhost:5190/api/upload/images/${image.imageUrl}`}
                     imageView
                   />
                 );

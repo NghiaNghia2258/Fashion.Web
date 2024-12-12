@@ -342,13 +342,11 @@ export default function ProductsView() {
                       onClick={async () => {
                         console.log(product);
                         if (!product.productVariants) {
-                           let productService = new ProductService();
-                           let res = await productService.GetById(product.id ?? '');
-			   //console.log(res);
-                           product = {...res.data};
+                          let productService = new ProductService();
+                          let res = await productService.GetById(product.id ?? '');
+                          product = { ...res.data };
                         }
                         product.isActive = !product.isActive;
-			console.log(products);
                         setProducts([...products]);
                       }}
                     >

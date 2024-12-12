@@ -30,7 +30,7 @@ export default function FileThumbnail({
   const { name = '', path = '', preview = '' } = fileData(file);
 
   const format = fileFormat(path || preview);
-
+  console.log(file);
   const renderContent =
     format === 'image' && imageView ? (
       <Box
